@@ -1,17 +1,17 @@
 import React from 'react';
 import {Redirect} from 'react-router-dom';
 import {FuseUtils} from '@fuse';
-import {UserConfig} from 'app/main/user/UserConfig';
+import {ManageConfig} from 'app/main/manage/ManageConfig';
 
 const routeConfigs = [
-    UserConfig
+    ManageConfig
 ];
 
 const routes = [
     ...FuseUtils.generateRoutesFromConfigs(routeConfigs),
     {
         path     : '/',
-        component: () => <Redirect to="/users" />
+        component: () => <Redirect to="/member" />
     }
 ];
 

@@ -6,31 +6,36 @@ const navigationConfig = [
         'icon'    : 'apps',
         'children': [
             {
-                'id'       : 'collapses',
-                'title'    : 'Collapses',
+                'id'       : 'manage',
+                'title'    : 'Manage',
                 'type'     : 'collapse',
-                'icon'     : 'dashboard',
+                'icon'     : 'settings',
                 'children' : [
+                    {
+                        'id'   : 'create-new',
+                        'title': 'Create new',
+                        'type' : 'item',
+                        'url'  : '/create-new'
+                    },
+                    {
+                        'id'   : 'formula',
+                        'title': 'Formula',
+                        'type' : 'item',
+                        'url'  : '/formula'
+                    },
                     {
                         'id'   : 'member',
                         'title': 'Member',
                         'type' : 'item',
-                        'url'  : '/apps/dashboards/project'
+                        'url'  : '/member'
                     },
                     {
                         'id'   : 'account',
-                        'title': 'Tài khoản',
+                        'title': 'Account',
                         'type' : 'item',
-                        'url'  : '/apps/dashboards/project'
+                        'url'  : '/account'
                     }
                 ]
-            },
-            {
-                'id'   : 'users',
-                'title': 'Users',
-                'type' : 'item',
-                'icon' : 'account_box',
-                'url'  : '/users'
             }
         ]
     }

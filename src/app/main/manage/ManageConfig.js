@@ -1,6 +1,6 @@
-import User from './User';
+import Member from './Member';
 
-export const UserConfig = {
+export const ManageConfig = {
     settings: {
         layout: {
             config: {}
@@ -8,8 +8,8 @@ export const UserConfig = {
     },
     routes  : [
         {
-            path     : '/users',
-            component: User
+            path     : '/member',
+            component: Member
         }
     ]
 };

@@ -6,6 +6,7 @@ import { withRouter } from 'react-router-dom';
 import { matchRoutes } from 'react-router-config';
 
 import MaterialTable from 'material-table';
+import MemberDialog from './MemberDialog';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -18,7 +19,7 @@ const styles = theme => ({
     layoutRoot: {}
 });
 
-class User extends Component {
+class Member extends Component {
 
     // const[state, setState] = React.useState({
     //     columns: [
@@ -47,32 +48,46 @@ class User extends Component {
         const { routes } = context;
 
         this.state = {
+            dialogOpen: false,
             routes,
-            columns: [
-                { title: 'Name', field: 'name' },
-                { title: 'Surname', field: 'surname' },
-                { title: 'Birth Year', field: 'birthYear', type: 'numeric' },
-                {
-                    title: 'Birth Place',
-                    field: 'birthCity',
-                    lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
-                },
+            columnsList: [
+                { title: 'Fullname', field: 'fullname' },
+                { title: 'Username', field: 'username' },
+                { title: 'Status', field: 'status' },
+                { title: 'Secondary password', field: 'password2' }
             ],
-            data: [
-                { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
-                {
-                    name: 'Zerya Betül',
-                    surname: 'Baran',
-                    birthYear: 2017,
-                    birthCity: 34,
-                },
+            columnsDetail: [
+                { title: 'Account', field: 'account', editable: 'never' },
+                { title: 'Member', field: 'member' },
+                { title: 'Formula group', field: 'formula-group', editable: 'never' },
+                { title: 'Formula name', field: 'formula-name' },
+                { title: 'Company', field: 'company', editable: 'never' },
+                { title: 'Currency', field: 'currency', editable: 'never' },
+                { title: 'Pay/Receive', field: 'pay-receive', editable: 'never' }
             ],
+            dataList: [
+                {
+                    fullname: '6789',
+                    username: 'AV8883013',
+                    status: 'Off',
+                    password2: ''
+                },
+                {
+                    fullname: 'CUSTOMER',
+                    username: 'AV8883014',
+                    status: 'Off',
+                    password2: ''
+                }
+            ],
+            dataDetail: [
+
+            ]
         };
     }
 
     render() {
         const { classes } = this.props;
-        const { columns, data } = this.state;
+        const { columnsList, columnsDetail, dataList, dataDetail, dialogOpen } = this.state;
 
         return (
             <FusePageSimple
@@ -81,24 +96,63 @@ class User extends Component {
                 }}
                 content={
                     <div className="p-24">
-                        <h2>Quản lý users</h2>
+                        <h2>Member</h2>
                         <br />
                         <MaterialTable
-                            title=""
-                            columns={columns}
-                            data={data}
+                            title="List of member"
+                            isLoading={false}
+                            columns={columnsList}
+                            data={dataList}
+                            options={{
+                                actionsColumnIndex: 5
+                            }}
+                            style={{
+                                width: '41%',
+                                float: 'left'
+                            }}
+                            actions={[
+                                {
+                                    icon: 'add',
+                                    isFreeAction: true,
+                                    onClick: () => {
+                                        console.log('add');
+                                    }
+                                },
+                                {
+                                    icon: 'edit',
+                                    onClick: rowData => {
+                                        console.log('edit');
+                                        this.setState({ dialogOpen: true });
+                                    }
+                                }
+                            ]}
                             editable={{
-                                onRowAdd: newData =>
+                                onRowDelete: oldData =>
                                     new Promise(resolve => {
                                         setTimeout(() => {
                                             resolve();
                                             this.setState(prevState => {
                                                 const data = [...prevState.data];
-                                                data.push(newData);
+                                                data.splice(data.indexOf(oldData), 1);
                                                 return { ...prevState, data };
                                             });
                                         }, 600);
                                     }),
+                            }}
+                        />
+
+                        <MaterialTable
+                            title="Member detail"
+                            columns={columnsDetail}
+                            data={dataDetail}
+                            options={{
+                                actionsColumnIndex: 8
+                            }}
+                            style={{
+                                width: '57%',
+                                float: 'right'
+                            }}
+                            editable={{
                                 onRowUpdate: (newData, oldData) =>
                                     new Promise(resolve => {
                                         setTimeout(() => {
@@ -125,6 +179,8 @@ class User extends Component {
                                     }),
                             }}
                         />
+
+                        <MemberDialog open={dialogOpen} />
                     </div>
                 }
             />
@@ -140,6 +196,6 @@ function mapStateToProps({ fuse }) {
 
 }
 
-User.contextType = AppContext;
+Member.contextType = AppContext;
 
-export default withStyles(styles, { withTheme: true })(withRouter(connect(mapStateToProps, mapDispatchToProps)(React.memo(User))));
+export default withStyles(styles, { withTheme: true })(withRouter(connect(mapStateToProps, mapDispatchToProps)(React.memo(Member))));
