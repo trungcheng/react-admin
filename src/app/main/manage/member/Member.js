@@ -48,6 +48,7 @@ class Member extends Component {
         const { routes } = context;
 
         this.state = {
+            type: 'add',
             dialogOpen: false,
             routes,
             columnsList: [
@@ -87,7 +88,7 @@ class Member extends Component {
 
     render() {
         const { classes } = this.props;
-        const { columnsList, columnsDetail, dataList, dataDetail, dialogOpen } = this.state;
+        const { columnsList, columnsDetail, dataList, dataDetail, dialogOpen, type } = this.state;
 
         return (
             <FusePageSimple
@@ -115,17 +116,25 @@ class Member extends Component {
                                     icon: 'add',
                                     isFreeAction: true,
                                     onClick: () => {
-                                        console.log('add');
+                                        this.setState({
+                                            dialogOpen: true,
+                                            type: 'add'
+                                        });
                                     }
                                 },
                                 {
                                     icon: 'edit',
                                     onClick: rowData => {
-                                        console.log('edit');
-                                        this.setState({ dialogOpen: true });
+                                        this.setState({ 
+                                            dialogOpen: true,
+                                            type: 'edit' 
+                                        });
                                     }
                                 }
                             ]}
+                            onRowClick={(event, rowData) => {
+                                console.log('row click');
+                            }}
                             editable={{
                                 onRowDelete: oldData =>
                                     new Promise(resolve => {
@@ -180,7 +189,7 @@ class Member extends Component {
                             }}
                         />
 
-                        <MemberDialog open={dialogOpen} />
+                        <MemberDialog open={dialogOpen} type={type} />
                     </div>
                 }
             />
