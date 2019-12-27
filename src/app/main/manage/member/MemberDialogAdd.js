@@ -1,24 +1,24 @@
 import React, { Component } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
+// import { makeStyles } from '@material-ui/core/styles';
+// import clsx from 'clsx';
 import _ from 'lodash';
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
+// import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-import Input from '@material-ui/core/Input';
-import FilledInput from '@material-ui/core/FilledInput';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputLabel from '@material-ui/core/InputLabel';
+// import Input from '@material-ui/core/Input';
+// import FilledInput from '@material-ui/core/FilledInput';
+// import OutlinedInput from '@material-ui/core/OutlinedInput';
+// import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
+// import FormGroup from '@material-ui/core/FormGroup';
+// import FormHelperText from '@material-ui/core/FormHelperText';
+// import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
@@ -26,7 +26,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
-class MemberDialog extends Component {
+class MemberDialogAdd extends Component {
 
     constructor(props) {
         super(props);
@@ -34,6 +34,7 @@ class MemberDialog extends Component {
         this.state = {
             openMode: props.open,
             showPassword: false,
+            showPasswordRepeat: false,
             data: {
                 fullname: '',
                 username: 'av8883',
@@ -81,13 +82,23 @@ class MemberDialog extends Component {
         });
     };
 
+    handleClickShowPasswordRepeat = () => {
+        this.setState({
+            showPasswordRepeat: !this.state.showPasswordRepeat
+        });
+    };
+
     handleMouseDownPassword = (e) => {
         e.preventDefault();
     };
 
     render() {
-        const { openMode, showPassword, data } = this.state;
-        const { type } = this.props;
+        const { 
+            openMode, 
+            showPassword, 
+            showPasswordRepeat, 
+            data 
+        } = this.state;
 
         return (
             <div>
@@ -206,17 +217,17 @@ class MemberDialog extends Component {
                                         label="Repeat password"
                                         id="repeat_password"
                                         onChange={(e) => this.handleChange('repeat_password', e)}
-                                        value={data.password}
-                                        type={showPassword ? 'text' : 'password'}
+                                        value={data.repeat_password}
+                                        type={showPasswordRepeat ? 'text' : 'password'}
                                         InputProps={{
                                             endAdornment: <InputAdornment position="end">
                                                 <IconButton
                                                     aria-label="toggle password visibility"
-                                                    onClick={this.handleClickShowPassword}
+                                                    onClick={this.handleClickShowPasswordRepeat}
                                                     onMouseDown={this.handleMouseDownPassword}
                                                     edge="end"
                                                 >
-                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                                                    {showPasswordRepeat ? <Visibility /> : <VisibilityOff />}
                                                 </IconButton>
                                             </InputAdornment>
                                         }}
@@ -240,4 +251,4 @@ class MemberDialog extends Component {
     }
 }
 
-export default MemberDialog;
+export default MemberDialogAdd;

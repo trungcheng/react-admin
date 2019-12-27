@@ -1,19 +1,17 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { FusePageSimple, DemoContent } from '@fuse';
-import _ from '@lodash';
+import { FusePageSimple } from '@fuse';
 import { withRouter } from 'react-router-dom';
-import { matchRoutes } from 'react-router-config';
 
 import MaterialTable from 'material-table';
-import MemberDialog from './MemberDialog';
+import MemberDialogAdd from './MemberDialogAdd';
+import MemberDialogEdit from './MemberDialogEdit';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as Actions from 'app/store/actions';
+import { fetchMembers, fetchDetail } from './store/actions';
 import AppContext from 'app/AppContext';
-
-import axios from 'axios';
 
 const styles = theme => ({
     layoutRoot: {}
@@ -21,43 +19,21 @@ const styles = theme => ({
 
 class Member extends Component {
 
-    // const[state, setState] = React.useState({
-    //     columns: [
-    //         { title: 'Name', field: 'name' },
-    //         { title: 'Surname', field: 'surname' },
-    //         { title: 'Birth Year', field: 'birthYear', type: 'numeric' },
-    //         {
-    //             title: 'Birth Place',
-    //             field: 'birthCity',
-    //             lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
-    //         },
-    //     ],
-    //     data: [
-    //         { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
-    //         {
-    //             name: 'Zerya Betül',
-    //             surname: 'Baran',
-    //             birthYear: 2017,
-    //             birthCity: 34,
-    //         },
-    //     ],
-    // });
-
-    constructor(props, context) {
+    constructor(props) {
         super(props);
-        const { routes } = context;
 
         this.state = {
-            type: 'add',
-            dialogOpen: false,
-            routes,
+            dialogOpenAdd: false,
+            dialogOpenEdit: false,
             columnsList: [
+                { title: '#', field: 'id' },
                 { title: 'Fullname', field: 'fullname' },
                 { title: 'Username', field: 'username' },
                 { title: 'Status', field: 'status' },
                 { title: 'Secondary password', field: 'password2' }
             ],
             columnsDetail: [
+                { title: '#', field: 'id' },
                 { title: 'Account', field: 'account', editable: 'never' },
                 { title: 'Member', field: 'member' },
                 { title: 'Formula group', field: 'formula-group', editable: 'never' },
@@ -66,29 +42,148 @@ class Member extends Component {
                 { title: 'Currency', field: 'currency', editable: 'never' },
                 { title: 'Pay/Receive', field: 'pay-receive', editable: 'never' }
             ],
-            dataList: [
-                {
-                    fullname: '6789',
-                    username: 'AV8883013',
-                    status: 'Off',
-                    password2: ''
-                },
-                {
-                    fullname: 'CUSTOMER',
-                    username: 'AV8883014',
-                    status: 'Off',
-                    password2: ''
-                }
-            ],
-            dataDetail: [
-
-            ]
+            dataList: [],
+            dataDetail: [],
+            dataEdit: {}
         };
     }
 
-    render() {
+    componentWillMount() {
+        this.props.fetchMembers();
+    }
+
+    renderMemberList = (members) => {
         const { classes } = this.props;
-        const { columnsList, columnsDetail, dataList, dataDetail, dialogOpen, type } = this.state;
+        const { 
+            columnsList, 
+            columnsDetail, 
+            dataList, 
+            dataDetail, 
+            dialogOpenAdd,
+            dialogOpenEdit,
+            dataEdit
+        } = this.state;
+
+        return (
+            <MaterialTable
+                title="List of member"
+                isLoading={false}
+                columns={columnsList}
+                data={members}
+                options={{
+                    actionsColumnIndex: 5
+                }}
+                style={{
+                    width: '41%',
+                    float: 'left'
+                }}
+                actions={[
+                    {
+                        icon: 'add',
+                        isFreeAction: true,
+                        onClick: () => {
+                            this.setState({
+                                dialogOpenAdd: true,
+                                dialogOpenEdit: false
+                            });
+                        }
+                    },
+                    {
+                        icon: 'edit',
+                        onClick: (rowData) => {
+                            this.setState({ 
+                                dialogOpenAdd: false,
+                                dialogOpenEdit: true,
+                                dataEdit: rowData
+                            });
+                        }
+                    }
+                ]}
+                onRowClick={(event, rowData) => {
+                    console.log('row click');
+                }}
+                editable={{
+                    onRowDelete: oldData =>
+                        new Promise(resolve => {
+                            setTimeout(() => {
+                                resolve();
+                                this.setState(prevState => {
+                                    const data = [...prevState.data];
+                                    data.splice(data.indexOf(oldData), 1);
+                                    return { ...prevState, data };
+                                });
+                            }, 600);
+                        }),
+                }}
+            />
+        );
+    }
+
+    renderMemberDetail = () => {
+        const { classes } = this.props;
+        const { 
+            columnsList, 
+            columnsDetail, 
+            dataList, 
+            dataDetail, 
+            dialogOpenAdd,
+            dialogOpenEdit,
+            dataEdit
+        } = this.state;
+
+        return (
+            <MaterialTable
+                title="Member detail"
+                columns={columnsDetail}
+                data={dataDetail}
+                options={{
+                    actionsColumnIndex: 8
+                }}
+                style={{
+                    width: '57%',
+                    float: 'right'
+                }}
+                editable={{
+                    onRowUpdate: (newData, oldData) =>
+                        new Promise(resolve => {
+                            setTimeout(() => {
+                                resolve();
+                                if (oldData) {
+                                    this.setState(prevState => {
+                                        const data = [...prevState.data];
+                                        data[data.indexOf(oldData)] = newData;
+                                        return { ...prevState, data };
+                                    });
+                                }
+                            }, 600);
+                        }),
+                    onRowDelete: oldData =>
+                        new Promise(resolve => {
+                            setTimeout(() => {
+                                resolve();
+                                this.setState(prevState => {
+                                    const data = [...prevState.data];
+                                    data.splice(data.indexOf(oldData), 1);
+                                    return { ...prevState, data };
+                                });
+                            }, 600);
+                        }),
+                }}
+            />
+        );
+    }
+
+    render() {
+        const { classes, members } = this.props;
+        const { 
+            columnsList, 
+            columnsDetail, 
+            dataList, 
+            dataDetail, 
+            dialogOpenAdd,
+            dialogOpenEdit,
+            dataEdit
+        } = this.state;
 
         return (
             <FusePageSimple
@@ -99,97 +194,11 @@ class Member extends Component {
                     <div className="p-24">
                         <h2>Member</h2>
                         <br />
-                        <MaterialTable
-                            title="List of member"
-                            isLoading={false}
-                            columns={columnsList}
-                            data={dataList}
-                            options={{
-                                actionsColumnIndex: 5
-                            }}
-                            style={{
-                                width: '41%',
-                                float: 'left'
-                            }}
-                            actions={[
-                                {
-                                    icon: 'add',
-                                    isFreeAction: true,
-                                    onClick: () => {
-                                        this.setState({
-                                            dialogOpen: true,
-                                            type: 'add'
-                                        });
-                                    }
-                                },
-                                {
-                                    icon: 'edit',
-                                    onClick: rowData => {
-                                        this.setState({ 
-                                            dialogOpen: true,
-                                            type: 'edit' 
-                                        });
-                                    }
-                                }
-                            ]}
-                            onRowClick={(event, rowData) => {
-                                console.log('row click');
-                            }}
-                            editable={{
-                                onRowDelete: oldData =>
-                                    new Promise(resolve => {
-                                        setTimeout(() => {
-                                            resolve();
-                                            this.setState(prevState => {
-                                                const data = [...prevState.data];
-                                                data.splice(data.indexOf(oldData), 1);
-                                                return { ...prevState, data };
-                                            });
-                                        }, 600);
-                                    }),
-                            }}
-                        />
+                        { this.renderMemberList(this.props.members) }
+                        { this.renderMemberDetail(this.props.members) }
 
-                        <MaterialTable
-                            title="Member detail"
-                            columns={columnsDetail}
-                            data={dataDetail}
-                            options={{
-                                actionsColumnIndex: 8
-                            }}
-                            style={{
-                                width: '57%',
-                                float: 'right'
-                            }}
-                            editable={{
-                                onRowUpdate: (newData, oldData) =>
-                                    new Promise(resolve => {
-                                        setTimeout(() => {
-                                            resolve();
-                                            if (oldData) {
-                                                this.setState(prevState => {
-                                                    const data = [...prevState.data];
-                                                    data[data.indexOf(oldData)] = newData;
-                                                    return { ...prevState, data };
-                                                });
-                                            }
-                                        }, 600);
-                                    }),
-                                onRowDelete: oldData =>
-                                    new Promise(resolve => {
-                                        setTimeout(() => {
-                                            resolve();
-                                            this.setState(prevState => {
-                                                const data = [...prevState.data];
-                                                data.splice(data.indexOf(oldData), 1);
-                                                return { ...prevState, data };
-                                            });
-                                        }, 600);
-                                    }),
-                            }}
-                        />
-
-                        <MemberDialog open={dialogOpen} type={type} />
+                        <MemberDialogAdd open={dialogOpenAdd} />
+                        <MemberDialogEdit open={dialogOpenEdit} data={dataEdit} />
                     </div>
                 }
             />
@@ -197,12 +206,18 @@ class Member extends Component {
     }
 }
 
-function mapDispatchToProps(dispatch) {
-
+const mapStateToProps = (state) => {
+    return {
+        members: state.member.list,
+        member: state.member.member
+    }
 }
 
-function mapStateToProps({ fuse }) {
-
+const mapDispatchToProps = (dispatch) => {
+    return {
+        fetchMembers: bindActionCreators(fetchMembers, dispatch),
+        fetchDetail: bindActionCreators(fetchDetail, dispatch)
+    }
 }
 
 Member.contextType = AppContext;

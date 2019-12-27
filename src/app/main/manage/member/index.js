@@ -1,7 +1,9 @@
 import Member from './Member';
-import MemberDialog from './MemberDialog';
+import MemberDialogAdd from './MemberDialogAdd';
+import MemberDialogEdit from './MemberDialogEdit';
 
 export {
     Member,
-    MemberDialog
+    MemberDialogAdd,
+    MemberDialogEdit
 }
