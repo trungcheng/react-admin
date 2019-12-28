@@ -35,13 +35,15 @@ class MemberDialogEdit extends Component {
             openMode: props.open,
             showPassword: false,
             showPasswordRepeat: false,
-            data: {
-                fullname: '',
-                username: 'av8883',
+            changePwdCondition: false,
+            defaultData: {
+                fullname: props.data.fullname,
+                username: '',
                 code1: 0,
                 code2: 2,
                 code3: 1,
                 status: false,
+                pwd2: false,
                 password: '',
                 repeat_password: ''
             }
@@ -54,25 +56,49 @@ class MemberDialogEdit extends Component {
                 openMode: nextProps.open
             });
         }
+        if (nextProps.data !== this.state.defaultData) {
+            this.setState({
+                defaultData: {
+                    ...this.state.defaultData,
+                    ...nextProps.data
+                }
+            }, () => {
+                this.setState({
+                    defaultData: {
+                        ...this.state.defaultData,
+                        status: (this.state.defaultData.status == 0) ? false : true
+                    }
+                });
+            });
+        }
     }
 
     handleClose = () => {
         this.setState({
-            openMode: false
+            openMode: false,
+            showPassword: false,
+            showPasswordRepeat: false,
+            changePwdCondition: false,
+            defaultData: {
+                ...this.state.defaultData,
+                pwd2: false
+            }
         });
     }
 
     handleSave = () => {
-        console.log('save');
+        const { defaultData } = this.state;
+        
+        console.log(defaultData);
     }
 
-    handleChange = (field, e) => {
-        const { data } = this.state;
+    handleChange = (field, value) => {
+        const { defaultData } = this.state;
 
-        data[field] = (field !== 'status') ? e.target.value : e.target.checked;
+        defaultData[field] = value;
 
         this.setState({
-            data
+            defaultData
         });
     };
 
@@ -96,9 +122,10 @@ class MemberDialogEdit extends Component {
         const { 
             openMode, 
             showPassword, 
-            showPasswordRepeat
+            showPasswordRepeat,
+            changePwdCondition,
+            defaultData
         } = this.state;
-        const { data } = this.props;
 
         return (
             <div>
@@ -109,7 +136,7 @@ class MemberDialogEdit extends Component {
                     onClose={this.handleClose}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Edit Member</DialogTitle>
+                    <DialogTitle id="form-dialog-title">Cập nhật thành viên</DialogTitle>
                     <DialogContent>
                         <form noValidate autoComplete="off">
                             <TextField
@@ -117,9 +144,9 @@ class MemberDialogEdit extends Component {
                                 required
                                 margin="dense"
                                 id="fullname"
-                                label="Fullname"
-                                onChange={(e) => this.handleChange('fullname', e)}
-                                value={data.fullname}
+                                label="Tên"
+                                onChange={(e) => this.handleChange('fullname', e.target.value)}
+                                value={defaultData.fullname}
                                 type="text"
                                 variant="outlined"
                                 style={{marginBottom: 10}}
@@ -129,9 +156,9 @@ class MemberDialogEdit extends Component {
                                     disabled
                                     margin="dense"
                                     id="username"
-                                    label="Username"
-                                    defaultValue={data.username}
-                                    onChange={(e) => this.handleChange('username', e)}
+                                    label="Tên đăng nhập"
+                                    defaultValue={defaultData.username}
+                                    onChange={(e) => this.handleChange('username', e.target.value)}
                                     type="text"
                                     variant="outlined"
                                 />
@@ -139,8 +166,8 @@ class MemberDialogEdit extends Component {
                                     margin="dense"
                                     id="code1"
                                     select
-                                    value={data.code1}
-                                    onChange={(e) => this.handleChange('code1', e)}
+                                    value={defaultData.code1}
+                                    onChange={(e) => this.handleChange('code1', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -153,8 +180,8 @@ class MemberDialogEdit extends Component {
                                     margin="dense"
                                     id="code2"
                                     select
-                                    value={data.code2}
-                                    onChange={(e) => this.handleChange('code2', e)}
+                                    value={defaultData.code2}
+                                    onChange={(e) => this.handleChange('code2', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -167,8 +194,8 @@ class MemberDialogEdit extends Component {
                                     margin="dense"
                                     id="code3"
                                     select
-                                    value={data.code3}
-                                    onChange={(e) => this.handleChange('code3', e)}
+                                    value={defaultData.code3}
+                                    onChange={(e) => this.handleChange('code3', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -181,22 +208,44 @@ class MemberDialogEdit extends Component {
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        checked={data.status}
-                                        onChange={(e) => this.handleChange('status', e)}
-                                        value={data.status}
+                                        checked={defaultData.status}
+                                        onChange={(e) => this.handleChange('status', e.target.checked)}
+                                        value={defaultData.status}
                                         color="primary"
                                     />
                                 }
-                                label="Status"
+                                label="Trạng thái"
+                            /><br />
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={defaultData.pwd2}
+                                        onChange={(e) => this.handleChange('pwd2', e.target.checked)}
+                                        value={defaultData.pwd2}
+                                        color="primary"
+                                    />
+                                }
+                                label="Khôi phục mật khẩu 2"
+                            /><br />
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={changePwdCondition}
+                                        onChange={(e) => this.setState({ changePwdCondition: !this.state.changePwdCondition })}
+                                        value={changePwdCondition}
+                                        color="primary"
+                                    />
+                                }
+                                label="Chọn vào đây nếu bạn muốn đổi mật khẩu"
                             /><br />
                             {
-                                data.status && <div>
+                                defaultData.status && changePwdCondition && <div>
                                     <TextField
                                         margin="dense"
-                                        label="Password"
+                                        label="Mật khẩu"
                                         id="password"
-                                        onChange={(e) => this.handleChange('password', e)}
-                                        value={data.password}
+                                        onChange={(e) => this.handleChange('password', e.target.value)}
+                                        value={defaultData.password}
                                         type={showPassword ? 'text' : 'password'}
                                         InputProps={{
                                             endAdornment: <InputAdornment position="end">
@@ -214,10 +263,10 @@ class MemberDialogEdit extends Component {
                                     /><br />
                                     <TextField
                                         margin="dense"
-                                        label="Repeat password"
+                                        label="Nhập lại mật khẩu"
                                         id="repeat_password"
-                                        onChange={(e) => this.handleChange('repeat_password', e)}
-                                        value={data.repeat_password}
+                                        onChange={(e) => this.handleChange('repeat_password', e.target.value)}
+                                        value={defaultData.repeat_password}
                                         type={showPasswordRepeat ? 'text' : 'password'}
                                         InputProps={{
                                             endAdornment: <InputAdornment position="end">
@@ -238,11 +287,11 @@ class MemberDialogEdit extends Component {
                         </form>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleClose} color="primary">
-                            Cancel
-                        </Button>
                         <Button onClick={this.handleSave} color="primary">
-                            Save
+                            Lưu
+                        </Button>
+                        <Button onClick={this.handleClose} color="primary">
+                            Hủy
                         </Button>
                     </DialogActions>
                 </Dialog>

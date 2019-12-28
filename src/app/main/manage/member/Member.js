@@ -4,12 +4,13 @@ import { FusePageSimple } from '@fuse';
 import { withRouter } from 'react-router-dom';
 
 import MaterialTable from 'material-table';
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
 import MemberDialogAdd from './MemberDialogAdd';
 import MemberDialogEdit from './MemberDialogEdit';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import * as Actions from 'app/store/actions';
 import { fetchMembers, fetchDetail } from './store/actions';
 import AppContext from 'app/AppContext';
 
@@ -25,26 +26,16 @@ class Member extends Component {
         this.state = {
             dialogOpenAdd: false,
             dialogOpenEdit: false,
-            columnsList: [
-                { title: '#', field: 'id' },
-                { title: 'Fullname', field: 'fullname' },
-                { title: 'Username', field: 'username' },
-                { title: 'Status', field: 'status' },
-                { title: 'Secondary password', field: 'password2' }
-            ],
-            columnsDetail: [
-                { title: '#', field: 'id' },
-                { title: 'Account', field: 'account', editable: 'never' },
-                { title: 'Member', field: 'member' },
-                { title: 'Formula group', field: 'formula-group', editable: 'never' },
-                { title: 'Formula name', field: 'formula-name' },
-                { title: 'Company', field: 'company', editable: 'never' },
-                { title: 'Currency', field: 'currency', editable: 'never' },
-                { title: 'Pay/Receive', field: 'pay-receive', editable: 'never' }
-            ],
-            dataList: [],
             dataDetail: [],
-            dataEdit: {}
+            dataEdit: {},
+            memberList: [
+                { value: '6789', label: '6789' },
+                { value: '79', label: '79' }
+            ],
+            formulaNameList: [
+                { value: 'LDBONG88-VND-0.2-PA-(-1)', label: 'LDBONG88-VND-0.2-PA-(-1)' },
+                { value: 'LDBONG88-VND-0.34-PA-(-1)', label: 'LDBONG88-VND-0.34-PA-(-1)' }
+            ]
         };
     }
 
@@ -53,23 +44,50 @@ class Member extends Component {
     }
 
     renderMemberList = (members) => {
-        const { classes } = this.props;
-        const { 
-            columnsList, 
-            columnsDetail, 
-            dataList, 
-            dataDetail, 
-            dialogOpenAdd,
-            dialogOpenEdit,
-            dataEdit
-        } = this.state;
+        const { isFetching } = this.props;
 
         return (
             <MaterialTable
-                title="List of member"
-                isLoading={false}
-                columns={columnsList}
-                data={members}
+                title="Danh sách thành viên"
+                isLoading={isFetching}
+                columns={[
+                    { title: '#', field: 'idx' },
+                    { title: 'Tên', field: 'fullname' },
+                    { title: 'Tên đăng nhập', field: 'username' },
+                    { title: 'Trạng thái', field: 'statusText' },
+                    { title: 'Mật khẩu 2', field: 'password2' }
+                ]}
+                localization={{
+                    pagination: {
+                        labelDisplayedRows: '{from}-{to} của {count}',
+                        labelRowsSelect: 'bản ghi',
+                        firstTooltip: 'Trang đầu',
+                        previousTooltip: 'Trang trước',
+                        nextTooltip: 'Trang tiếp',
+                        lastTooltip: 'Trang cuối'
+                    },
+                    toolbar: {
+                        nRowsSelected: '{0} bản ghi được chọn',
+                        searchPlaceholder: 'Tìm kiếm',
+                        searchTooltip: 'Tìm kiếm'
+                    },
+                    header: {
+                        actions: 'Hành động'
+                    },
+                    body: {
+                        deleteTooltip: "Xóa",
+                        emptyDataSourceMessage: 'Không có dữ liệu',
+                        filterRow: {
+                            filterTooltip: 'Lọc'
+                        },
+                        editRow: {
+                            cancelTooltip: 'Hủy',
+                            saveTooltip: 'Xác nhận',
+                            deleteText: 'Bạn có chắc chắn muốn xóa?'
+                        }
+                    }
+                }}
+                data={members} 
                 options={{
                     actionsColumnIndex: 5
                 }}
@@ -80,6 +98,7 @@ class Member extends Component {
                 actions={[
                     {
                         icon: 'add',
+                        tooltip: 'Thêm mới',
                         isFreeAction: true,
                         onClick: () => {
                             this.setState({
@@ -90,7 +109,8 @@ class Member extends Component {
                     },
                     {
                         icon: 'edit',
-                        onClick: (rowData) => {
+                        tooltip: 'Chỉnh sửa',
+                        onClick: (event, rowData) => {
                             this.setState({ 
                                 dialogOpenAdd: false,
                                 dialogOpenEdit: true,
@@ -100,7 +120,12 @@ class Member extends Component {
                     }
                 ]}
                 onRowClick={(event, rowData) => {
-                    console.log('row click');
+                    this.setState({
+                        dialogOpenAdd: false,
+                        dialogOpenEdit: false
+                    }, () => {
+                        this.props.fetchDetail(rowData.id);
+                    });
                 }}
                 editable={{
                     onRowDelete: oldData =>
@@ -119,25 +144,96 @@ class Member extends Component {
         );
     }
 
-    renderMemberDetail = () => {
-        const { classes } = this.props;
-        const { 
-            columnsList, 
-            columnsDetail, 
-            dataList, 
-            dataDetail, 
-            dialogOpenAdd,
-            dialogOpenEdit,
-            dataEdit
-        } = this.state;
+    renderMemberDetail = (member) => {
+        const { memberList, formulaNameList } = this.state;
 
         return (
             <MaterialTable
-                title="Member detail"
-                columns={columnsDetail}
-                data={dataDetail}
+                title="Chi tiết thành viên"
+                columns={[
+                    { title: '#', field: 'idx', editable: 'never' },
+                    { title: 'Tài khoản', field: 'acc_name', editable: 'never' },
+                    { 
+                        title: 'Thành viên', 
+                        field: 'member',
+                        editComponent: props => (
+                            <TextField
+                                margin="dense"
+                                id="member"
+                                select
+                                value={props.value}
+                                onChange={e => props.onChange(e.target.value)}
+                                variant="outlined"
+                            >
+                                {memberList.map(option => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        ) 
+                    },
+                    { title: 'Nhóm công thức', field: 'formula_group_name', editable: 'never' },
+                    { 
+                        title: 'Tên công thức', 
+                        field: 'formula_name',
+                        editComponent: props => (
+                            <TextField
+                                margin="dense"
+                                id="formula_name"
+                                select
+                                value={props.value}
+                                onChange={e => props.onChange(e.target.value)}
+                                variant="outlined"
+                            >
+                                {formulaNameList.map(option => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        )  
+                    },
+                    { title: 'Công ty', field: 'banker_name', editable: 'never' },
+                    { title: 'Loại tiền', field: 'currency', editable: 'never' },
+                    { title: 'Giao/Nhận', field: 'pay_receive', editable: 'never' },
+                    { title: 'Loại', field: 'type_name', editable: 'never' },
+                    { title: 'Giá trị', field: 'value', editable: 'never' }
+                ]}
+                localization={{
+                    pagination: {
+                        labelDisplayedRows: '{from}-{to} của {count}',
+                        labelRowsSelect: 'bản ghi',
+                        firstTooltip: 'Trang đầu',
+                        previousTooltip: 'Trang trước',
+                        nextTooltip: 'Trang tiếp',
+                        lastTooltip: 'Trang cuối'
+                    },
+                    toolbar: {
+                        nRowsSelected: '{0} bản ghi được chọn',
+                        searchPlaceholder: 'Tìm kiếm',
+                        searchTooltip: 'Tìm kiếm'
+                    },
+                    header: {
+                        actions: 'Hành động'
+                    },
+                    body: {
+                        editTooltip: "Chỉnh sửa",
+                        deleteTooltip: "Xóa",
+                        emptyDataSourceMessage: 'Không có dữ liệu',
+                        filterRow: {
+                            filterTooltip: 'Lọc'
+                        },
+                        editRow: {
+                            cancelTooltip: 'Hủy',
+                            saveTooltip: 'Xác nhận',
+                            deleteText: 'Bạn có chắc chắn muốn xóa?'
+                        }
+                    }
+                }}
+                data={member}
                 options={{
-                    actionsColumnIndex: 8
+                    actionsColumnIndex: 10
                 }}
                 style={{
                     width: '57%',
@@ -174,12 +270,8 @@ class Member extends Component {
     }
 
     render() {
-        const { classes, members } = this.props;
+        const { classes, members, member } = this.props;
         const { 
-            columnsList, 
-            columnsDetail, 
-            dataList, 
-            dataDetail, 
             dialogOpenAdd,
             dialogOpenEdit,
             dataEdit
@@ -192,10 +284,10 @@ class Member extends Component {
                 }}
                 content={
                     <div className="p-24">
-                        <h2>Member</h2>
+                        <h2>Thành viên</h2>
                         <br />
-                        { this.renderMemberList(this.props.members) }
-                        { this.renderMemberDetail(this.props.members) }
+                        { this.renderMemberList(members) }
+                        { this.renderMemberDetail(member) }
 
                         <MemberDialogAdd open={dialogOpenAdd} />
                         <MemberDialogEdit open={dialogOpenEdit} data={dataEdit} />
@@ -208,8 +300,9 @@ class Member extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        members: state.member.list,
-        member: state.member.member
+        isFetching: state.member.member.isFetching,
+        members: state.member.member.list,
+        member: state.member.member.detail
     }
 }
 

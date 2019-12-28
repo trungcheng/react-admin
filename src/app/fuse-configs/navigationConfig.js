@@ -7,31 +7,31 @@ const navigationConfig = [
         'children': [
             {
                 'id'       : 'manage',
-                'title'    : 'Manage',
+                'title'    : 'Quản lý',
                 'type'     : 'collapse',
                 'icon'     : 'settings',
                 'children' : [
                     {
                         'id'   : 'create-new',
-                        'title': 'Create new',
+                        'title': 'Tạo mới',
                         'type' : 'item',
                         'url'  : '/create-new'
                     },
                     {
                         'id'   : 'formula',
-                        'title': 'Formula',
+                        'title': 'Công thức',
                         'type' : 'item',
                         'url'  : '/formula'
                     },
                     {
                         'id'   : 'member',
-                        'title': 'Member',
+                        'title': 'Thành viên',
                         'type' : 'item',
                         'url'  : '/member'
                     },
                     {
                         'id'   : 'account',
-                        'title': 'Account',
+                        'title': 'Tài khoản',
                         'type' : 'item',
                         'url'  : '/account'
                     }

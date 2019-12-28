@@ -58,18 +58,26 @@ class MemberDialogAdd extends Component {
 
     handleClose = () => {
         this.setState({
-            openMode: false
+            openMode: false,
+            showPassword: false,
+            showPasswordRepeat: false,
+            data: {
+                ...this.state.data,
+                status: false
+            }
         });
     }
 
     handleSave = () => {
-        console.log('save');
+        const { data } = this.state;
+        
+        console.log(data);
     }
 
-    handleChange = (field, e) => {
+    handleChange = (field, value) => {
         const { data } = this.state;
 
-        data[field] = (field !== 'status') ? e.target.value : e.target.checked;
+        data[field] = value;
 
         this.setState({
             data
@@ -109,7 +117,7 @@ class MemberDialogAdd extends Component {
                     onClose={this.handleClose}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Create Member</DialogTitle>
+                    <DialogTitle id="form-dialog-title">Thêm mới thành viên</DialogTitle>
                     <DialogContent>
                         <form noValidate autoComplete="off">
                             <TextField
@@ -117,8 +125,8 @@ class MemberDialogAdd extends Component {
                                 required
                                 margin="dense"
                                 id="fullname"
-                                label="Fullname"
-                                onChange={(e) => this.handleChange('fullname', e)}
+                                label="Tên"
+                                onChange={(e) => this.handleChange('fullname', e.target.value)}
                                 value={data.fullname}
                                 type="text"
                                 variant="outlined"
@@ -129,9 +137,9 @@ class MemberDialogAdd extends Component {
                                     disabled
                                     margin="dense"
                                     id="username"
-                                    label="Username"
+                                    label="Tên đăng nhập"
                                     defaultValue={data.username}
-                                    onChange={(e) => this.handleChange('username', e)}
+                                    onChange={(e) => this.handleChange('username', e.target.value)}
                                     type="text"
                                     variant="outlined"
                                 />
@@ -140,7 +148,7 @@ class MemberDialogAdd extends Component {
                                     id="code1"
                                     select
                                     value={data.code1}
-                                    onChange={(e) => this.handleChange('code1', e)}
+                                    onChange={(e) => this.handleChange('code1', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -154,7 +162,7 @@ class MemberDialogAdd extends Component {
                                     id="code2"
                                     select
                                     value={data.code2}
-                                    onChange={(e) => this.handleChange('code2', e)}
+                                    onChange={(e) => this.handleChange('code2', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -168,7 +176,7 @@ class MemberDialogAdd extends Component {
                                     id="code3"
                                     select
                                     value={data.code3}
-                                    onChange={(e) => this.handleChange('code3', e)}
+                                    onChange={(e) => this.handleChange('code3', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -182,20 +190,20 @@ class MemberDialogAdd extends Component {
                                 control={
                                     <Checkbox
                                         checked={data.status}
-                                        onChange={(e) => this.handleChange('status', e)}
+                                        onChange={(e) => this.handleChange('status', e.target.checked)}
                                         value={data.status}
                                         color="primary"
                                     />
                                 }
-                                label="Status"
+                                label="Trạng thái"
                             /><br />
                             {
                                 data.status && <div>
                                     <TextField
                                         margin="dense"
-                                        label="Password"
+                                        label="Mật khẩu"
                                         id="password"
-                                        onChange={(e) => this.handleChange('password', e)}
+                                        onChange={(e) => this.handleChange('password', e.target.value)}
                                         value={data.password}
                                         type={showPassword ? 'text' : 'password'}
                                         InputProps={{
@@ -214,9 +222,9 @@ class MemberDialogAdd extends Component {
                                     /><br />
                                     <TextField
                                         margin="dense"
-                                        label="Repeat password"
+                                        label="Nhập lại mật khẩu"
                                         id="repeat_password"
-                                        onChange={(e) => this.handleChange('repeat_password', e)}
+                                        onChange={(e) => this.handleChange('repeat_password', e.target.value)}
                                         value={data.repeat_password}
                                         type={showPasswordRepeat ? 'text' : 'password'}
                                         InputProps={{
@@ -238,11 +246,11 @@ class MemberDialogAdd extends Component {
                         </form>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleClose} color="primary">
-                            Cancel
-                        </Button>
                         <Button onClick={this.handleSave} color="primary">
-                            Save
+                            Lưu
+                        </Button>
+                        <Button onClick={this.handleClose} color="primary">
+                            Hủy
                         </Button>
                     </DialogActions>
                 </Dialog>

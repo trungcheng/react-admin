@@ -3,11 +3,14 @@ import * as Actions from 'app/store/actions';
 
 export function fetchMembers() {
     return function (dispatch) {
+        dispatch({ 
+            type: Actions.FETCH_MEMBERS_REQUEST
+        });
         memberService.fetchMembers()
             .then(response => {
                     return dispatch({
                         type: Actions.FETCH_MEMBERS_SUCCESS,
-                        payload: response.data.data
+                        payload: response.data
                     });
                 }
             )
@@ -26,7 +29,7 @@ export function fetchDetail(memberId) {
             .then(response => {
                     return dispatch({
                         type: Actions.FETCH_MEMBER_DETAIL_SUCCESS,
-                        payload: response.data.data
+                        payload: response.data
                     });
                 }
             )
