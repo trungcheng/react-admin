@@ -68,26 +68,84 @@ class jwtService extends FuseUtils.EventEmitter {
 
     signInWithEmailAndPassword = (email, password) => {
         return new Promise((resolve, reject) => {
-            axios.get('/api/auth', {
-                data: {
-                    email,
-                    password
+            setTimeout(() => {
+                if (email == 'admin' && password == '123456') {
+                    this.setSession('access_token');
+                    resolve({
+                        uuid    : 'XgbuVEXBU5gtSKdbQRP1Zbbby1i1',
+                        from    : 'custom-db',
+                        password: "admin",
+                        role    : "admin",
+                        data    : {
+                            'displayName': 'Abbott Keitch',
+                            'photoURL'   : 'assets/images/avatars/Abbott.jpg',
+                            'email'      : 'admin',
+                            settings     : {
+                                layout          : {
+                                    style : 'layout1',
+                                    config: {
+                                        scroll : 'content',
+                                        navbar : {
+                                            display : true,
+                                            folded  : true,
+                                            position: 'left'
+                                        },
+                                        toolbar: {
+                                            display : true,
+                                            style   : 'fixed',
+                                            position: 'below'
+                                        },
+                                        footer : {
+                                            display : true,
+                                            style   : 'fixed',
+                                            position: 'below'
+                                        },
+                                        mode   : 'fullwidth'
+                                    }
+                                },
+                                customScrollbars: true,
+                                theme           : {
+                                    main   : 'defaultDark',
+                                    navbar : 'defaultDark',
+                                    toolbar: 'defaultDark',
+                                    footer : 'defaultDark'
+                                }
+                            },
+                            shortcuts    : [
+                                'calendar',
+                                'mail',
+                                'contacts'
+                            ]
+                        }
+                    });
+                } else {
+                    reject({
+                        email: 'Tên đăng nhập hoặc mật khẩu không đúng',
+                        password: null
+                    });
                 }
-            }).then(response => {
-                if ( response.data.user )
-                {
-                    this.setSession(response.data.access_token);
-                    resolve(response.data.user);
-                }
-                else
-                {
-                    reject(response.data.error);
-                }
-            });
+            }, 600);
+            // axios.get('/api/auth', {
+            //     data: {
+            //         email,
+            //         password
+            //     }
+            // }).then(response => {
+            //     if ( response.data.user )
+            //     {
+            //         this.setSession(response.data.access_token);
+            //         resolve(response.data.user);
+            //     }
+            //     else
+            //     {
+            //         reject(response.data.error);
+            //     }
+            // });
         });
     };
 
     signInWithToken = () => {
+        console.log('ahihi');
         return new Promise((resolve, reject) => {
             axios.get('/api/auth/access-token', {
                 data: {
@@ -137,6 +195,7 @@ class jwtService extends FuseUtils.EventEmitter {
     };
 
     isAuthTokenValid = access_token => {
+        console.log('vao day');
         if ( !access_token )
         {
             return false;

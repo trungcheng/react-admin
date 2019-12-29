@@ -69,18 +69,18 @@ function UserMenu(props)
                             <ListItemIcon className="min-w-40">
                                 <Icon>lock</Icon>
                             </ListItemIcon>
-                            <ListItemText className="pl-0" primary="Login"/>
+                            <ListItemText className="pl-0" primary="Đăng nhập"/>
                         </MenuItem>
                         <MenuItem component={Link} to="/register">
                             <ListItemIcon className="min-w-40">
                                 <Icon>person_add</Icon>
                             </ListItemIcon>
-                            <ListItemText className="pl-0" primary="Register"/>
+                            <ListItemText className="pl-0" primary="Đăng ký"/>
                         </MenuItem>
                     </React.Fragment>
                 ) : (
                     <React.Fragment>
-                        <MenuItem component={Link} to="/pages/profile" onClick={userMenuClose}>
+                        {/* <MenuItem component={Link} to="/pages/profile" onClick={userMenuClose}>
                             <ListItemIcon className="min-w-40">
                                 <Icon>account_circle</Icon>
                             </ListItemIcon>
@@ -91,7 +91,7 @@ function UserMenu(props)
                                 <Icon>mail</Icon>
                             </ListItemIcon>
                             <ListItemText className="pl-0" primary="Inbox"/>
-                        </MenuItem>
+                        </MenuItem> */}
                         <MenuItem
                             onClick={() => {
                                 dispatch(authActions.logoutUser());
@@ -101,7 +101,7 @@ function UserMenu(props)
                             <ListItemIcon className="min-w-40">
                                 <Icon>exit_to_app</Icon>
                             </ListItemIcon>
-                            <ListItemText className="pl-0" primary="Logout"/>
+                            <ListItemText className="pl-0" primary="Đăng xuất" />
                         </MenuItem>
                     </React.Fragment>
                 )}

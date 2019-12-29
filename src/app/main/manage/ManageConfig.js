@@ -1,4 +1,5 @@
 import { Member } from './member';
+import { Account } from './account';
 
 export const ManageConfig = {
     settings: {
@@ -10,6 +11,10 @@ export const ManageConfig = {
         {
             path     : '/member',
             component: Member
+        },
+        {
+            path     : '/account',
+            component: Account
         }
     ]
 };

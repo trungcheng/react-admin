@@ -11,18 +11,18 @@ const navigationConfig = [
                 'type'     : 'collapse',
                 'icon'     : 'settings',
                 'children' : [
-                    {
-                        'id'   : 'create-new',
-                        'title': 'Tạo mới',
-                        'type' : 'item',
-                        'url'  : '/create-new'
-                    },
-                    {
-                        'id'   : 'formula',
-                        'title': 'Công thức',
-                        'type' : 'item',
-                        'url'  : '/formula'
-                    },
+                    // {
+                    //     'id'   : 'create-new',
+                    //     'title': 'Tạo mới',
+                    //     'type' : 'item',
+                    //     'url'  : '/create-new'
+                    // },
+                    // {
+                    //     'id'   : 'formula',
+                    //     'title': 'Công thức',
+                    //     'type' : 'item',
+                    //     'url'  : '/formula'
+                    // },
                     {
                         'id'   : 'member',
                         'title': 'Thành viên',

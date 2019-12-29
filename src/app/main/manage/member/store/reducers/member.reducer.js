@@ -10,7 +10,7 @@ const member = function (state = {}, action) {
                 return {
                     ...mem,
                     idx: idx + 1,
-                    statusText: (mem.status == 0) ? 'Off' : 'On'
+                    statusText: (mem.status === 0) ? 'Off' : 'On'
                 }
             });
 

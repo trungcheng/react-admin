@@ -66,7 +66,7 @@ class MemberDialogEdit extends Component {
                 this.setState({
                     defaultData: {
                         ...this.state.defaultData,
-                        status: (this.state.defaultData.status == 0) ? false : true
+                        status: (this.state.defaultData.status === 0) ? false : true
                     }
                 });
             });
