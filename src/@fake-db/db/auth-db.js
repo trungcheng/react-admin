@@ -13,7 +13,7 @@ let authDB = {
         {
             uuid    : 'XgbuVEXBU5gtSKdbQRP1Zbbby1i1',
             from    : 'custom-db',
-            password: "admin",
+            password: "123456",
             role    : "admin",
             data    : {
                 'displayName': 'Abbott Keitch',
@@ -60,7 +60,7 @@ let authDB = {
         {
             uuid    : 'XgbuVEXBU6gtSKdbTYR1Zbbby1i3',
             from    : 'custom-db',
-            password: "staff",
+            password: "123456",
             role    : "staff",
             data    : {
                 'displayName': 'Arnold Matlock',
