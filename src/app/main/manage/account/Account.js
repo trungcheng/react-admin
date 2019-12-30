@@ -77,7 +77,8 @@ class Account extends Component {
                         }
                     }
                 }}
-                data={accounts} 
+                data={accounts}
+                parentChildData={(row, rows) => rows.find(a => a.id === row.acc_parent_id)}
                 options={{
                     actionsColumnIndex: 5
                 }}
