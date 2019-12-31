@@ -1,3 +1,4 @@
+import { Formula } from './formula';
 import { Member } from './member';
 import { Account } from './account';
 
@@ -8,6 +9,10 @@ export const ManageConfig = {
         }
     },
     routes  : [
+        {
+            path     : '/formula',
+            component: Formula
+        },
         {
             path     : '/member',
             component: Member
