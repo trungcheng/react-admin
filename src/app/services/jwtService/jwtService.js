@@ -1,6 +1,7 @@
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 import FuseUtils from '@fuse/FuseUtils';
+import FuseSettingsConfig from 'app/fuse-configs/settingsConfig';
 
 class jwtService extends FuseUtils.EventEmitter {
 

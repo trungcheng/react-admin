@@ -9,6 +9,8 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import Tooltip from '@material-ui/core/Tooltip';
+import Icon from '@material-ui/core/Icon';
 
 import FormulaDialogAdd from './FormulaDialogAdd';
 import FormulaDialogEdit from './FormulaDialogEdit';
@@ -42,8 +44,6 @@ class Formula extends Component {
     renderFormulaList = (formulas) => {
         const { isFetching } = this.props;
 
-        console.log(formulas);
-
         return (
             <MaterialTable
                 title="Danh sách công thức"
@@ -55,15 +55,19 @@ class Formula extends Component {
                         return (
                             <TableHead>
                                 <TableRow>
+                                    <TableCell rowSpan={2}>#</TableCell>
                                     <TableCell rowSpan={2}>Tên công thức</TableCell>
                                     <TableCell rowSpan={2}>Nhóm</TableCell>
                                     <TableCell rowSpan={2}>Công ty</TableCell>
                                     <TableCell rowSpan={2}>Loại tiền</TableCell>
                                     <TableCell rowSpan={2}>Giao/Nhận</TableCell>
-                                    <TableCell colSpan={2} align="center">
+                                    <TableCell align="center" colSpan={2}>
                                         Chi tiết
                                     </TableCell>
+                                    <TableCell></TableCell>
                                     <TableCell rowSpan={2}>Số TK sử dụng</TableCell>
+                                    <TableCell rowSpan={2}>Sửa</TableCell>
+                                    <TableCell rowSpan={2}>Xóa</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell align="center">Loại</TableCell>
@@ -72,17 +76,41 @@ class Formula extends Component {
                             </TableHead>
                         );
                     },
-                    Row: ({ formulas }) => {
-                        return (
-                            <TableRow>
-                                <TableCell>{formulas.tenct}</TableCell>
-                                <TableCell align="center">{formulas.book_name}</TableCell>
-                                <TableCell align="center">{formulas.banker_name}</TableCell>
-                                <TableCell align="center">{formulas.currency_name}</TableCell>
-                                <TableCell align="center">{formulas.giaonhan}</TableCell>
-                                <TableCell align="center"></TableCell>
-                            </TableRow>
-                        );
+                    Row: props => {
+                        return formulas.map((formula, idx) => {
+                            return (
+                                <TableRow>
+                                    <TableCell>{idx + 1}</TableCell>
+                                    <TableCell>{formula.tenct}</TableCell>
+                                    <TableCell>{formula.book_name}</TableCell>
+                                    <TableCell>{formula.banker_name}</TableCell>
+                                    <TableCell>{formula.currency_name}</TableCell>
+                                    <TableCell>{formula.giaonhan}</TableCell>
+                                    <TableCell>{formula.format_name}</TableCell>
+                                    <TableCell colSpan={2}>
+                                        <TableRow>
+                                            <TableCell align="left">Hệ số</TableCell>
+                                            <TableCell align="left">1</TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell style={{ border: "none" }} align="left">Giá thầu</TableCell>
+                                            <TableCell style={{ border: "none" }} align="left">0.09</TableCell>
+                                        </TableRow>
+                                    </TableCell>
+                                    <TableCell>1</TableCell>
+                                    <TableCell>
+                                        <Tooltip title="Chỉnh sửa">
+                                            <Icon>edit</Icon>
+                                        </Tooltip>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Tooltip title="Xóa">
+                                            <Icon>delete</Icon>
+                                        </Tooltip>
+                                    </TableCell>
+                                </TableRow>
+                            )
+                        })
                     }
                 }}
                 localization={{
