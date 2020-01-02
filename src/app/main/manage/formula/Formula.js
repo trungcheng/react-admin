@@ -4,16 +4,17 @@ import { FusePageSimple } from '@fuse';
 import { withRouter } from 'react-router-dom';
 
 import MaterialTable from 'material-table';
-import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Icon from '@material-ui/core/Icon';
 
 import FormulaDialogAdd from './FormulaDialogAdd';
 import FormulaDialogEdit from './FormulaDialogEdit';
+import FormulaDialogDelete from './FormulaDialogDelete';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -32,13 +33,33 @@ class Formula extends Component {
         this.state = {
             dialogOpenAdd: false,
             dialogOpenEdit: false,
+            dialogOpenDelete: false,
             dataDetail: [],
-            dataEdit: {}
+            dataEdit: {},
+            dataDelete: {}
         };
     }
 
     componentWillMount() {
         this.props.fetchFormulas();
+    }
+
+    handleOpenFormEdit = (data) => {
+        this.setState({
+            dialogOpenAdd: false,
+            dialogOpenEdit: true,
+            dialogOpenDelete: false,
+            dataEdit: data
+        });
+    }
+
+    handleOpenFormDelete = (data) => {
+        this.setState({
+            dialogOpenAdd: false,
+            dialogOpenEdit: false,
+            dialogOpenDelete: true,
+            dataDelete: data
+        });
     }
 
     renderFormulaList = (formulas) => {
@@ -64,7 +85,6 @@ class Formula extends Component {
                                     <TableCell align="center" colSpan={2}>
                                         Chi tiết
                                     </TableCell>
-                                    <TableCell></TableCell>
                                     <TableCell rowSpan={2}>Số TK sử dụng</TableCell>
                                     <TableCell rowSpan={2}>Sửa</TableCell>
                                     <TableCell rowSpan={2}>Xóa</TableCell>
@@ -76,41 +96,49 @@ class Formula extends Component {
                             </TableHead>
                         );
                     },
-                    Row: props => {
-                        return formulas.map((formula, idx) => {
-                            return (
-                                <TableRow>
-                                    <TableCell>{idx + 1}</TableCell>
-                                    <TableCell>{formula.tenct}</TableCell>
-                                    <TableCell>{formula.book_name}</TableCell>
-                                    <TableCell>{formula.banker_name}</TableCell>
-                                    <TableCell>{formula.currency_name}</TableCell>
-                                    <TableCell>{formula.giaonhan}</TableCell>
-                                    <TableCell>{formula.format_name}</TableCell>
-                                    <TableCell colSpan={2}>
-                                        <TableRow>
-                                            <TableCell align="left">Hệ số</TableCell>
-                                            <TableCell align="left">1</TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell style={{ border: "none" }} align="left">Giá thầu</TableCell>
-                                            <TableCell style={{ border: "none" }} align="left">0.09</TableCell>
-                                        </TableRow>
-                                    </TableCell>
-                                    <TableCell>1</TableCell>
-                                    <TableCell>
-                                        <Tooltip title="Chỉnh sửa">
+                    Row: ({ data }) => {
+                        return (
+                            <TableRow key={data.idx}>
+                                <TableCell>{data.idx}</TableCell>
+                                <TableCell>{data.tenct}</TableCell>
+                                <TableCell>{data.book_name}</TableCell>
+                                <TableCell>{data.banker_name.toUpperCase()}</TableCell>
+                                <TableCell>{data.currency_name}</TableCell>
+                                <TableCell>{data.giaonhan}</TableCell>
+                                <TableCell>{data.format_name}</TableCell>
+                                <TableCell>
+                                    <TableRow>
+                                        <TableCell align="left">Hệ số</TableCell>
+                                        <TableCell align="left">{data.field_value[0].value}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell style={{ border: "none" }} align="left">Giá thầu</TableCell>
+                                        <TableCell style={{ border: "none" }} align="left">{data.field_value[1].value}</TableCell>
+                                    </TableRow>
+                                </TableCell>
+                                <TableCell></TableCell>
+                                <TableCell align="left">
+                                    <Tooltip title="Chỉnh sửa">
+                                        <IconButton 
+                                            aria-label="edit"
+                                            onClick={() => this.handleOpenFormEdit(data)}
+                                        >
                                             <Icon>edit</Icon>
-                                        </Tooltip>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Tooltip title="Xóa">
+                                        </IconButton>
+                                    </Tooltip>
+                                </TableCell>
+                                <TableCell align="left">
+                                    <Tooltip title="Xóa">
+                                        <IconButton 
+                                            aria-label="delete"
+                                            onClick={() => this.handleOpenFormDelete(data)}
+                                        >
                                             <Icon>delete</Icon>
-                                        </Tooltip>
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })
+                                        </IconButton>
+                                    </Tooltip>
+                                </TableCell>
+                            </TableRow>
+                        );
                     }
                 }}
                 localization={{
@@ -143,9 +171,6 @@ class Formula extends Component {
                         }
                     }
                 }}
-                options={{
-                    actionsColumnIndex: 5
-                }}
                 actions={[
                     {
                         icon: 'add',
@@ -154,35 +179,12 @@ class Formula extends Component {
                         onClick: () => {
                             this.setState({
                                 dialogOpenAdd: true,
-                                dialogOpenEdit: false
-                            });
-                        }
-                    },
-                    {
-                        icon: 'edit',
-                        tooltip: 'Chỉnh sửa',
-                        onClick: (event, rowData) => {
-                            this.setState({
-                                dialogOpenAdd: false,
-                                dialogOpenEdit: true,
-                                dataEdit: rowData
+                                dialogOpenEdit: false,
+                                dialogOpenDelete: false
                             });
                         }
                     }
                 ]}
-                editable={{
-                    onRowDelete: oldData =>
-                        new Promise(resolve => {
-                            setTimeout(() => {
-                                resolve();
-                                this.setState(prevState => {
-                                    const data = [...prevState.data];
-                                    data.splice(data.indexOf(oldData), 1);
-                                    return { ...prevState, data };
-                                });
-                            }, 600);
-                        }),
-                }}
             />
         );
     }
@@ -192,7 +194,9 @@ class Formula extends Component {
         const {
             dialogOpenAdd,
             dialogOpenEdit,
-            dataEdit
+            dialogOpenDelete,
+            dataEdit,
+            dataDelete
         } = this.state;
 
         return (
@@ -208,6 +212,7 @@ class Formula extends Component {
 
                         <FormulaDialogAdd open={dialogOpenAdd} />
                         <FormulaDialogEdit open={dialogOpenEdit} data={dataEdit} />
+                        <FormulaDialogDelete open={dialogOpenDelete} data={dataDelete} />
                     </div>
                 }
             />

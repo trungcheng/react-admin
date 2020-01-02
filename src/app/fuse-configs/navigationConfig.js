@@ -17,12 +17,12 @@ const navigationConfig = [
                     //     'type' : 'item',
                     //     'url'  : '/create-new'
                     // },
-                    // {
-                    //     'id'   : 'formula',
-                    //     'title': 'Công thức',
-                    //     'type' : 'item',
-                    //     'url'  : '/formula'
-                    // },
+                    {
+                        'id'   : 'formula',
+                        'title': 'Công thức',
+                        'type' : 'item',
+                        'url'  : '/formula'
+                    },
                     {
                         'id'   : 'member',
                         'title': 'Thành viên',

@@ -78,7 +78,7 @@ class memberService extends FuseUtils.EventEmitter {
                     currency: "VND",
                     pay_receive: "Receive",
                     type_name: "Loto-PA",
-                    value: "Price:0.34"
+                    value: "Giá thầu: 0.34"
                 }];
                 resolve({
                     status: true,

@@ -12,19 +12,9 @@ class formulaService extends FuseUtils.EventEmitter {
             setTimeout(() => {
                 let data = [
                     {
-                        _id: "576a624553bf136435176ad3",
-                        uid: "56850ba0097802b9f2392a24",
-                        dv_tiente: "56a9e8f219ba3b81be8c58f1",
-                        f_format_id: "56850ba7097802b9f23934e3",
-                        banker_id: "56850ba0097802b9f23929b4",
-                        __v: 0,
-                        deleted: 0,
-                        updated: 0,
-                        created: 1466589765,
+                        id: "576a624553bf136435176ad3",
                         giaonhan: "Nhận",
                         tenct: "332BET-USD-0.02-5.5-A",
-                        id: "576a624553bf136435176ad3",
-                        editable: true,
                         banker_name: "332bet",
                         format_name: "Sportbook-All",
                         currency_name: "USD",
@@ -32,31 +22,35 @@ class formulaService extends FuseUtils.EventEmitter {
                         book_id: "56850ba0097802b9f23929ad",
                         field_value: [
                             {
-                                _id: "576a624553bf136435176ad4",
-                                f_field_id: "56850ba7097802b9f23934d5",
-                                f_pattern_id: "576a624553bf136435176ad3",
-                                uid: "56850ba0097802b9f2392a24",
-                                __v: 0,
-                                deleted: 0,
-                                updated: 0,
-                                created: 1466589765,
                                 value: "5.5",
                                 id: "576a624553bf136435176ad4",
-                                field_value_id: "576a624553bf136435176ad4",
                                 field_name: "he_so"
                             },
                             {
-                                _id: "576a624553bf136435176ad5",
-                                f_field_id: "56850ba7097802b9f23934d6",
-                                f_pattern_id: "576a624553bf136435176ad3",
-                                uid: "56850ba0097802b9f2392a24",
-                                __v: 0,
-                                deleted: 0,
-                                updated: 0,
-                                created: 1466589765,
                                 value: "0.02",
                                 id: "576a624553bf136435176ad5",
-                                field_value_id: "576a624553bf136435176ad5",
+                                field_name: "gia_thau"
+                            }
+                        ]
+                    },
+                    {
+                        id: "576a624553bf136435176aa3",
+                        giaonhan: "Nhận",
+                        tenct: "332BET-USD-0.18-5.5-A",
+                        banker_name: "332bet",
+                        format_name: "Sportbook-All",
+                        currency_name: "USD",
+                        book_name: "sportsbook",
+                        book_id: "56850ba0097802b9f23929ad",
+                        field_value: [
+                            {
+                                value: "5.5",
+                                id: "576a624553bf136435176ad4",
+                                field_name: "he_so"
+                            },
+                            {
+                                value: "0.18",
+                                id: "576a624553bf136435176ad5",
                                 field_name: "gia_thau"
                             }
                         ]
