@@ -67,22 +67,23 @@ class jwtService extends FuseUtils.EventEmitter {
         });
     };
 
-    signInWithEmailAndPassword = (email, password) => {
+    signInWithEmailAndPassword = (username, password) => {
         return new Promise((resolve, reject) => {
-            axios.get('/api/auth', {
-                data: {
-                    email,
-                    password
-                }
+            axios.post(`${FuseSettingsConfig.apiUrl}/api/authen/login`, {
+                username,
+                password
             }).then(response => {
-                if ( response.data.user )
+                if (response.data.Result === 1)
                 {
-                    this.setSession(response.data.access_token);
-                    resolve(response.data.user);
+                    this.setSession(response.data.Data.Token);
+                    resolve(response.data.Data);
                 }
                 else
                 {
-                    reject(response.data.error);
+                    reject({
+                        email   : response.data.Message.includes('Tài khoản') ? response.data.Message : null,
+                        password: response.data.Message.includes('Mật khẩu') ? response.data.Message : null
+                    });
                 }
             });
         });
@@ -90,16 +91,14 @@ class jwtService extends FuseUtils.EventEmitter {
 
     signInWithToken = () => {
         return new Promise((resolve, reject) => {
-            axios.get('/api/auth/access-token', {
-                data: {
-                    access_token: this.getAccessToken()
-                }
+            axios.post(`${FuseSettingsConfig.apiUrl}/api/authen/verifytoken`, {
+                token: this.getAccessToken()
             })
                 .then(response => {
-                    if ( response.data.user )
+                    if (response.data.Result === 1)
                     {
-                        this.setSession(response.data.access_token);
-                        resolve(response.data.user);
+                        this.setSession(response.data.Data.Token);
+                        resolve(response.data.Data);
                     }
                     else
                     {

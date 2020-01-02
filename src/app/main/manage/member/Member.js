@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { FusePageSimple } from '@fuse';
 import { withRouter } from 'react-router-dom';
+import clsx from 'clsx';
 
 import MaterialTable from 'material-table';
 import TextField from '@material-ui/core/TextField';
@@ -47,100 +48,99 @@ class Member extends Component {
         const { isFetching } = this.props;
 
         return (
-            <MaterialTable
-                title="Danh sách thành viên"
-                isLoading={isFetching}
-                columns={[
-                    { title: '#', field: 'idx' },
-                    { title: 'Tên', field: 'fullname' },
-                    { title: 'Tên đăng nhập', field: 'username' },
-                    { title: 'Trạng thái', field: 'statusText' },
-                    { title: 'Mật khẩu 2', field: 'password2' }
-                ]}
-                localization={{
-                    pagination: {
-                        labelDisplayedRows: '{from}-{to} của {count}',
-                        labelRowsSelect: 'bản ghi',
-                        firstTooltip: 'Trang đầu',
-                        previousTooltip: 'Trang trước',
-                        nextTooltip: 'Trang tiếp',
-                        lastTooltip: 'Trang cuối'
-                    },
-                    toolbar: {
-                        nRowsSelected: '{0} bản ghi được chọn',
-                        searchPlaceholder: 'Tìm kiếm',
-                        searchTooltip: 'Tìm kiếm'
-                    },
-                    header: {
-                        actions: 'Hành động'
-                    },
-                    body: {
-                        deleteTooltip: "Xóa",
-                        emptyDataSourceMessage: 'Không có dữ liệu',
-                        filterRow: {
-                            filterTooltip: 'Lọc'
+            <div className="member-list">
+                <MaterialTable
+                    xs={12}
+                    title="Danh sách thành viên"
+                    isLoading={isFetching}
+                    columns={[
+                        { title: '#', field: 'idx' },
+                        { title: 'Tên', field: 'fullname' },
+                        { title: 'Tên đăng nhập', field: 'username' },
+                        { title: 'Trạng thái', field: 'statusText' },
+                        { title: 'Mật khẩu 2', field: 'password2' }
+                    ]}
+                    localization={{
+                        pagination: {
+                            labelDisplayedRows: '{from}-{to} của {count}',
+                            labelRowsSelect: 'bản ghi',
+                            firstTooltip: 'Trang đầu',
+                            previousTooltip: 'Trang trước',
+                            nextTooltip: 'Trang tiếp',
+                            lastTooltip: 'Trang cuối'
                         },
-                        editRow: {
-                            cancelTooltip: 'Hủy',
-                            saveTooltip: 'Xác nhận',
-                            deleteText: 'Bạn có chắc chắn muốn xóa?'
+                        toolbar: {
+                            nRowsSelected: '{0} bản ghi được chọn',
+                            searchPlaceholder: 'Tìm kiếm',
+                            searchTooltip: 'Tìm kiếm'
+                        },
+                        header: {
+                            actions: 'Hành động'
+                        },
+                        body: {
+                            deleteTooltip: "Xóa",
+                            emptyDataSourceMessage: 'Không có dữ liệu',
+                            filterRow: {
+                                filterTooltip: 'Lọc'
+                            },
+                            editRow: {
+                                cancelTooltip: 'Hủy',
+                                saveTooltip: 'Xác nhận',
+                                deleteText: 'Bạn có chắc chắn muốn xóa?'
+                            }
                         }
-                    }
-                }}
-                data={members} 
-                options={{
-                    actionsColumnIndex: 5
-                }}
-                style={{
-                    width: '41%',
-                    float: 'left'
-                }}
-                actions={[
-                    {
-                        icon: 'add',
-                        tooltip: 'Thêm mới',
-                        isFreeAction: true,
-                        onClick: () => {
-                            this.setState({
-                                dialogOpenAdd: true,
-                                dialogOpenEdit: false
-                            });
-                        }
-                    },
-                    {
-                        icon: 'edit',
-                        tooltip: 'Chỉnh sửa',
-                        onClick: (event, rowData) => {
-                            this.setState({ 
-                                dialogOpenAdd: false,
-                                dialogOpenEdit: true,
-                                dataEdit: rowData
-                            });
-                        }
-                    }
-                ]}
-                onRowClick={(event, rowData) => {
-                    this.setState({
-                        dialogOpenAdd: false,
-                        dialogOpenEdit: false
-                    }, () => {
-                        this.props.fetchDetail(rowData.id);
-                    });
-                }}
-                editable={{
-                    onRowDelete: oldData =>
-                        new Promise(resolve => {
-                            setTimeout(() => {
-                                resolve();
-                                this.setState(prevState => {
-                                    const data = [...prevState.data];
-                                    data.splice(data.indexOf(oldData), 1);
-                                    return { ...prevState, data };
+                    }}
+                    data={members} 
+                    options={{
+                        actionsColumnIndex: 5
+                    }}
+                    actions={[
+                        {
+                            icon: 'add',
+                            tooltip: 'Thêm mới',
+                            isFreeAction: true,
+                            onClick: () => {
+                                this.setState({
+                                    dialogOpenAdd: true,
+                                    dialogOpenEdit: false
                                 });
-                            }, 600);
-                        }),
-                }}
-            />
+                            }
+                        },
+                        {
+                            icon: 'edit',
+                            tooltip: 'Chỉnh sửa',
+                            onClick: (event, rowData) => {
+                                this.setState({ 
+                                    dialogOpenAdd: false,
+                                    dialogOpenEdit: true,
+                                    dataEdit: rowData
+                                });
+                            }
+                        }
+                    ]}
+                    onRowClick={(event, rowData) => {
+                        this.setState({
+                            dialogOpenAdd: false,
+                            dialogOpenEdit: false
+                        }, () => {
+                            this.props.fetchDetail(rowData.id);
+                        });
+                    }}
+                    editable={{
+                        onRowDelete: oldData =>
+                            new Promise(resolve => {
+                                setTimeout(() => {
+                                    resolve();
+                                    this.setState(prevState => {
+                                        const data = [...prevState.data];
+                                        data.splice(data.indexOf(oldData), 1);
+                                        return { ...prevState, data };
+                                    });
+                                }, 600);
+                            }),
+                    }}
+                />
+            </div>
         );
     }
 
@@ -148,124 +148,123 @@ class Member extends Component {
         const { memberList, formulaNameList } = this.state;
 
         return (
-            <MaterialTable
-                title="Chi tiết thành viên"
-                columns={[
-                    { title: '#', field: 'idx', editable: 'never' },
-                    { title: 'Tài khoản', field: 'acc_name', editable: 'never' },
-                    { 
-                        title: 'Thành viên', 
-                        field: 'member',
-                        editComponent: props => (
-                            <TextField
-                                margin="dense"
-                                id="member"
-                                select
-                                value={props.value}
-                                onChange={e => props.onChange(e.target.value)}
-                                variant="outlined"
-                            >
-                                {memberList.map(option => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        ) 
-                    },
-                    { title: 'Nhóm công thức', field: 'formula_group_name', editable: 'never' },
-                    { 
-                        title: 'Tên công thức', 
-                        field: 'formula_name',
-                        editComponent: props => (
-                            <TextField
-                                margin="dense"
-                                id="formula_name"
-                                select
-                                value={props.value}
-                                onChange={e => props.onChange(e.target.value)}
-                                variant="outlined"
-                            >
-                                {formulaNameList.map(option => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        )  
-                    },
-                    { title: 'Công ty', field: 'banker_name', editable: 'never' },
-                    { title: 'Loại tiền', field: 'currency', editable: 'never' },
-                    { title: 'Giao/Nhận', field: 'pay_receive', editable: 'never' },
-                    { title: 'Loại', field: 'type_name', editable: 'never' },
-                    { title: 'Giá trị', field: 'value', editable: 'never' }
-                ]}
-                localization={{
-                    pagination: {
-                        labelDisplayedRows: '{from}-{to} của {count}',
-                        labelRowsSelect: 'bản ghi',
-                        firstTooltip: 'Trang đầu',
-                        previousTooltip: 'Trang trước',
-                        nextTooltip: 'Trang tiếp',
-                        lastTooltip: 'Trang cuối'
-                    },
-                    toolbar: {
-                        nRowsSelected: '{0} bản ghi được chọn',
-                        searchPlaceholder: 'Tìm kiếm',
-                        searchTooltip: 'Tìm kiếm'
-                    },
-                    header: {
-                        actions: 'Hành động'
-                    },
-                    body: {
-                        editTooltip: "Chỉnh sửa",
-                        deleteTooltip: "Xóa",
-                        emptyDataSourceMessage: 'Không có dữ liệu',
-                        filterRow: {
-                            filterTooltip: 'Lọc'
+            <div className="member-detail">
+                <MaterialTable
+                    xs={12}
+                    title="Chi tiết thành viên"
+                    columns={[
+                        { title: '#', field: 'idx', editable: 'never' },
+                        { title: 'Tài khoản', field: 'acc_name', editable: 'never' },
+                        { 
+                            title: 'Thành viên', 
+                            field: 'member',
+                            editComponent: props => (
+                                <TextField
+                                    margin="dense"
+                                    id="member"
+                                    select
+                                    value={props.value}
+                                    onChange={e => props.onChange(e.target.value)}
+                                    variant="outlined"
+                                >
+                                    {memberList.map(option => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                            ) 
                         },
-                        editRow: {
-                            cancelTooltip: 'Hủy',
-                            saveTooltip: 'Xác nhận',
-                            deleteText: 'Bạn có chắc chắn muốn xóa?'
+                        { title: 'Nhóm công thức', field: 'formula_group_name', editable: 'never' },
+                        { 
+                            title: 'Tên công thức', 
+                            field: 'formula_name',
+                            editComponent: props => (
+                                <TextField
+                                    margin="dense"
+                                    id="formula_name"
+                                    select
+                                    value={props.value}
+                                    onChange={e => props.onChange(e.target.value)}
+                                    variant="outlined"
+                                >
+                                    {formulaNameList.map(option => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                            )  
+                        },
+                        { title: 'Công ty', field: 'banker_name', editable: 'never' },
+                        { title: 'Loại tiền', field: 'currency', editable: 'never' },
+                        { title: 'Giao/Nhận', field: 'pay_receive', editable: 'never' },
+                        { title: 'Loại', field: 'type_name', editable: 'never' },
+                        { title: 'Giá trị', field: 'value', editable: 'never' }
+                    ]}
+                    localization={{
+                        pagination: {
+                            labelDisplayedRows: '{from}-{to} của {count}',
+                            labelRowsSelect: 'bản ghi',
+                            firstTooltip: 'Trang đầu',
+                            previousTooltip: 'Trang trước',
+                            nextTooltip: 'Trang tiếp',
+                            lastTooltip: 'Trang cuối'
+                        },
+                        toolbar: {
+                            nRowsSelected: '{0} bản ghi được chọn',
+                            searchPlaceholder: 'Tìm kiếm',
+                            searchTooltip: 'Tìm kiếm'
+                        },
+                        header: {
+                            actions: 'Hành động'
+                        },
+                        body: {
+                            editTooltip: "Chỉnh sửa",
+                            deleteTooltip: "Xóa",
+                            emptyDataSourceMessage: 'Không có dữ liệu',
+                            filterRow: {
+                                filterTooltip: 'Lọc'
+                            },
+                            editRow: {
+                                cancelTooltip: 'Hủy',
+                                saveTooltip: 'Xác nhận',
+                                deleteText: 'Bạn có chắc chắn muốn xóa?'
+                            }
                         }
-                    }
-                }}
-                data={member}
-                options={{
-                    actionsColumnIndex: 10
-                }}
-                style={{
-                    width: '57%',
-                    float: 'right'
-                }}
-                editable={{
-                    onRowUpdate: (newData, oldData) =>
-                        new Promise(resolve => {
-                            setTimeout(() => {
-                                resolve();
-                                if (oldData) {
+                    }}
+                    data={member}
+                    options={{
+                        actionsColumnIndex: 10
+                    }}
+                    editable={{
+                        onRowUpdate: (newData, oldData) =>
+                            new Promise(resolve => {
+                                setTimeout(() => {
+                                    resolve();
+                                    if (oldData) {
+                                        this.setState(prevState => {
+                                            const data = [...prevState.data];
+                                            data[data.indexOf(oldData)] = newData;
+                                            return { ...prevState, data };
+                                        });
+                                    }
+                                }, 600);
+                            }),
+                        onRowDelete: oldData =>
+                            new Promise(resolve => {
+                                setTimeout(() => {
+                                    resolve();
                                     this.setState(prevState => {
                                         const data = [...prevState.data];
-                                        data[data.indexOf(oldData)] = newData;
+                                        data.splice(data.indexOf(oldData), 1);
                                         return { ...prevState, data };
                                     });
-                                }
-                            }, 600);
-                        }),
-                    onRowDelete: oldData =>
-                        new Promise(resolve => {
-                            setTimeout(() => {
-                                resolve();
-                                this.setState(prevState => {
-                                    const data = [...prevState.data];
-                                    data.splice(data.indexOf(oldData), 1);
-                                    return { ...prevState, data };
-                                });
-                            }, 600);
-                        }),
-                }}
-            />
+                                }, 600);
+                            }),
+                    }}
+                />
+            </div>
         );
     }
 

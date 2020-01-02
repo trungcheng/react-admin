@@ -88,7 +88,7 @@ export function createUserSettingsFirebase(authUser)
 /**
  * Set User Data
  */
-export function setUserData(user)
+export function setUserData(dataUser)
 {
     return (dispatch) => {
 
@@ -100,6 +100,35 @@ export function setUserData(user)
         /*
         Set User Data
          */
+
+        let role;
+        switch (dataUser.GroupID) {
+            case 1:
+                role = "admin";
+                break;
+            case 2:
+                role = "user";
+                break;
+            case 3:
+                role = "userSub";
+                break;
+            default:
+                role = "member";
+                break;
+        }
+
+        const user = {
+            role,
+            from: 'auth',
+            data: {
+                displayName: dataUser.FullName,
+                photoURL   : 'assets/images/avatars/Abbott.jpg',
+                email      : dataUser.UserName,
+                settings   : {},
+                shortcuts  : []
+            }
+        };
+
         dispatch({
             type   : SET_USER_DATA,
             payload: user
