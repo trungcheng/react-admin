@@ -133,7 +133,6 @@ class FormulaDialogAdd extends Component {
                                 id="code"
                                 label="Code"
                                 select
-                                value={data.account}
                                 onChange={(e) => this.handleChange('code', e.target.value)}
                                 value={data.code}
                                 variant="outlined"

@@ -22,7 +22,7 @@ const routes = [
     {
         path     : '/',
         exact    : true,
-        component: () => <Redirect to="/formula" />
+        component: () => <Redirect to="/create-new" />
     },
     {
         component: () => <Redirect to="/error-404" />

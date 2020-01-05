@@ -11,12 +11,12 @@ const navigationConfig = [
                 'type'     : 'collapse',
                 'icon'     : 'settings',
                 'children' : [
-                    // {
-                    //     'id'   : 'create-new',
-                    //     'title': 'Tạo mới',
-                    //     'type' : 'item',
-                    //     'url'  : '/create-new'
-                    // },
+                    {
+                        'id'   : 'create-new',
+                        'title': 'Tạo mới',
+                        'type' : 'item',
+                        'url'  : '/create-new'
+                    },
                     {
                         'id'   : 'formula',
                         'title': 'Công thức',

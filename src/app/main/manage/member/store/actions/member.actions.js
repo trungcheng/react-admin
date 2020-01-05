@@ -23,6 +23,25 @@ export function fetchMembers() {
     }
 }
 
+export function saveMember(data) {
+    return function (dispatch) {
+        memberService.saveMember(data)
+            .then(response => {
+                    return dispatch({
+                        type: Actions.SAVE_MEMBER_SUCCESS,
+                        payload: response.status
+                    });
+                }
+            )
+            .catch(error => {
+                return dispatch({
+                    type: Actions.SAVE_MEMBER_ERROR,
+                    payload: error
+                });
+            });
+    }
+}
+
 export function fetchDetail(memberId) {
     return function (dispatch) {
         memberService.fetchDetail(memberId)

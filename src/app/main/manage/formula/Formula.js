@@ -4,7 +4,6 @@ import { FusePageSimple } from '@fuse';
 import { withRouter } from 'react-router-dom';
 
 import MaterialTable from 'material-table';
-import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";

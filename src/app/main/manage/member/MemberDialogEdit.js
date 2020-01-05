@@ -11,20 +11,27 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import { TextFieldFormsy, CheckboxFormsy } from '@fuse';
+import Formsy from 'formsy-react';
 // import Input from '@material-ui/core/Input';
 // import FilledInput from '@material-ui/core/FilledInput';
 // import OutlinedInput from '@material-ui/core/OutlinedInput';
 // import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
 // import FormGroup from '@material-ui/core/FormGroup';
-// import FormHelperText from '@material-ui/core/FormHelperText';
-// import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { saveMember } from './store/actions';
+import AppContext from 'app/AppContext';
 
 class MemberDialogEdit extends Component {
 
@@ -36,16 +43,16 @@ class MemberDialogEdit extends Component {
             showPassword: false,
             showPasswordRepeat: false,
             changePwdCondition: false,
+            isFormValid: false,
             defaultData: {
-                fullname: props.data.fullname,
-                username: '',
-                code1: 0,
-                code2: 2,
-                code3: 1,
-                status: false,
-                pwd2: false,
-                password: '',
-                repeat_password: ''
+                UserID: 2,
+                FullName: '',
+                UserName: '',
+                Phone: '',
+                Status: true,
+                // Pwd2: false,
+                Password: '',
+                Repeat_Password: ''
             }
         }
     }
@@ -66,7 +73,7 @@ class MemberDialogEdit extends Component {
                 this.setState({
                     defaultData: {
                         ...this.state.defaultData,
-                        status: (this.state.defaultData.status === 0) ? false : true
+                        Status: (this.state.defaultData.Status === 0) ? false : true
                     }
                 });
             });
@@ -78,18 +85,24 @@ class MemberDialogEdit extends Component {
             openMode: false,
             showPassword: false,
             showPasswordRepeat: false,
-            changePwdCondition: false,
-            defaultData: {
-                ...this.state.defaultData,
-                pwd2: false
-            }
+            changePwdCondition: false
+            // defaultData: {
+            //     ...this.state.defaultData,
+            //     Pwd2: false
+            // }
         });
     }
 
     handleSave = () => {
         const { defaultData } = this.state;
         
-        console.log(defaultData);
+        delete defaultData['Repeat_Password'];
+        delete defaultData['StatusName'];
+        delete defaultData['tableData'];
+        delete defaultData['idx'];
+        defaultData.Status = defaultData.Status ? 1 : 0; 
+        
+        this.props.saveMember(defaultData);
     }
 
     handleChange = (field, value) => {
@@ -118,12 +131,26 @@ class MemberDialogEdit extends Component {
         e.preventDefault();
     };
 
+    disableButton = () => {
+        this.setState({
+            isFormValid: false
+        });
+    }
+
+    enableButton = () => {
+        this.setState({
+            isFormValid: true
+        });
+    }
+
     render() {
+        const { success, errorMsg } = this.props;
         const { 
             openMode, 
             showPassword, 
             showPasswordRepeat,
             changePwdCondition,
+            isFormValid,
             defaultData
         } = this.state;
 
@@ -136,168 +163,206 @@ class MemberDialogEdit extends Component {
                     onClose={this.handleClose}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Cập nhật thành viên</DialogTitle>
-                    <DialogContent>
-                        <form noValidate autoComplete="off">
-                            <TextField
+                    <Formsy
+                        onValidSubmit={this.handleSave}
+                        onValid={this.enableButton}
+                        onInvalid={this.disableButton}
+                        ref={c => this.refForm = c}
+                        className="flex flex-col justify-center w-full"
+                    >
+                        <DialogTitle id="form-dialog-title">Cập nhật thành viên</DialogTitle>
+                        <DialogContent>
+
+                            <TextFieldFormsy
+                                className="mb-10"
+                                fullWidth
                                 autoFocus
                                 required
-                                margin="dense"
-                                id="fullname"
+                                name="FullName"
                                 label="Tên"
-                                onChange={(e) => this.handleChange('fullname', e.target.value)}
-                                value={defaultData.fullname}
+                                value={defaultData.FullName}
+                                onChange={(e) => this.handleChange('FullName', e.target.value)}
+                                validations={{
+                                    minLength: 4
+                                }}
+                                validationErrors={{
+                                    required: 'Tên không được để trống',
+                                    minLength: 'Tên tối thiểu 4 kí tự'
+                                }}
                                 type="text"
                                 variant="outlined"
-                                style={{marginBottom: 10}}
                             />
-                            <div>
-                                <TextField
-                                    disabled
-                                    margin="dense"
-                                    id="username"
-                                    label="Tên đăng nhập"
-                                    defaultValue={defaultData.username}
-                                    onChange={(e) => this.handleChange('username', e.target.value)}
-                                    type="text"
-                                    variant="outlined"
-                                />
-                                <TextField
-                                    margin="dense"
-                                    id="code1"
-                                    select
-                                    value={defaultData.code1}
-                                    onChange={(e) => this.handleChange('code1', e.target.value)}
-                                    variant="outlined"
-                                >
-                                    {_.range(0, 10).map(value => (
-                                        <MenuItem key={value} value={value}>
-                                            {value}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                                <TextField
-                                    margin="dense"
-                                    id="code2"
-                                    select
-                                    value={defaultData.code2}
-                                    onChange={(e) => this.handleChange('code2', e.target.value)}
-                                    variant="outlined"
-                                >
-                                    {_.range(0, 10).map(value => (
-                                        <MenuItem key={value} value={value}>
-                                            {value}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                                <TextField
-                                    margin="dense"
-                                    id="code3"
-                                    select
-                                    value={defaultData.code3}
-                                    onChange={(e) => this.handleChange('code3', e.target.value)}
-                                    variant="outlined"
-                                >
-                                    {_.range(0, 10).map(value => (
-                                        <MenuItem key={value} value={value}>
-                                            {value}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            </div>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={defaultData.status}
-                                        onChange={(e) => this.handleChange('status', e.target.checked)}
-                                        value={defaultData.status}
-                                        color="primary"
-                                    />
-                                }
+
+                            <TextFieldFormsy
+                                className="mb-10"
+                                fullWidth
+                                disabled
+                                required
+                                name="UserName"
+                                label="Tên đăng nhập"
+                                value={defaultData.UserName}
+                                onChange={(e) => this.handleChange('UserName', e.target.value)}
+                                validations={{
+                                    minLength: 4
+                                }}
+                                validationErrors={{
+                                    minLength: 'Tên đăng nhập tối thiểu 4 kí tự'
+                                }}
+                                type="text"
+                                variant="outlined"
+                            />
+
+                            <TextFieldFormsy
+                                className="mb-10"
+                                fullWidth
+                                name="Phone"
+                                label="Số điện thoại"
+                                value={defaultData.Phone}
+                                onChange={(e) => this.handleChange('Phone', e.target.value)}
+                                validations={{
+                                    minLength: 10,
+                                    maxLength: 11
+                                }}
+                                validationErrors={{
+                                    minLength: 'Số điện thoại tối thiểu 10 số',
+                                    maxLength: 'Số điện thoại không vượt quá 11 số'
+                                }}
+                                type="number"
+                                variant="outlined"
+                            />
+
+                            {/* <CheckboxFormsy
+                                className="mb-5"
+                                name="Pwd2"
+                                checked={defaultData.Pwd2}
+                                onChange={(e) => this.handleChange('Pwd2', e.target.checked)}
+                                value={defaultData.Pwd2}
+                                color="primary"
+                                label="Khôi phục mật khẩu 2"
+                            />
+
+                            <CheckboxFormsy
+                                className="mb-5"
+                                name="Pwd_Condition"
+                                checked={changePwdCondition}
+                                onChange={(e) => this.setState({ changePwdCondition: !this.state.changePwdCondition })}
+                                value={changePwdCondition}
+                                color="primary"
+                                label="Chọn vào đây nếu bạn muốn đổi mật khẩu"
+                            /> */}
+
+                            {/* { */}
+                                {/* defaultData.Status && changePwdCondition && <div> */}
+                            <TextFieldFormsy
+                                className="mb-10"
+                                fullWidth
+                                name="Password"
+                                label="Mật khẩu"
+                                value={defaultData.Password}
+                                onChange={(e) => this.handleChange('Password', e.target.value)}
+                                validations={{
+                                    minLength: 6
+                                }}
+                                validationErrors={{
+                                    minLength: 'Mật khẩu tối thiểu 6 kí tự'
+                                }}
+                                type={showPassword ? 'text' : 'password'}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={this.handleClickShowPassword}
+                                            onMouseDown={this.handleMouseDownPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }}
+                                variant="outlined"
+                            />
+
+                            <TextFieldFormsy
+                                className="mb-5"
+                                fullWidth
+                                name="Repeat_Password"
+                                label="Nhập lại mật khẩu"
+                                value={defaultData.Repeat_Password}
+                                onChange={(e) => this.handleChange('Repeat_Password', e.target.value)}
+                                validations={{
+                                    minLength: 6,
+                                    equalsField: 'Password'
+                                }}
+                                validationErrors={{
+                                    minLength: 'Nhập lại mật khẩu tối thiểu 6 kí tự',
+                                    equalsField: 'Mật khẩu chưa trùng khớp'
+                                }}
+                                type={showPasswordRepeat ? 'text' : 'password'}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={this.handleClickShowPasswordRepeat}
+                                            onMouseDown={this.handleMouseDownPassword}
+                                            edge="end"
+                                        >
+                                            {showPasswordRepeat ? <Visibility /> : <VisibilityOff />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }}
+                                variant="outlined"
+                            />
+                                {/* </div> */}
+                            {/* } */}
+
+                            <CheckboxFormsy
+                                name="Status"
+                                checked={defaultData.Status}
+                                onChange={(e) => this.handleChange('Status', e.target.checked)}
+                                value={defaultData.Status}
+                                color="primary"
                                 label="Trạng thái"
                             /><br />
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={defaultData.pwd2}
-                                        onChange={(e) => this.handleChange('pwd2', e.target.checked)}
-                                        value={defaultData.pwd2}
-                                        color="primary"
-                                    />
-                                }
-                                label="Khôi phục mật khẩu 2"
-                            /><br />
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={changePwdCondition}
-                                        onChange={(e) => this.setState({ changePwdCondition: !this.state.changePwdCondition })}
-                                        value={changePwdCondition}
-                                        color="primary"
-                                    />
-                                }
-                                label="Chọn vào đây nếu bạn muốn đổi mật khẩu"
-                            /><br />
+
                             {
-                                defaultData.status && changePwdCondition && <div>
-                                    <TextField
-                                        margin="dense"
-                                        label="Mật khẩu"
-                                        id="password"
-                                        onChange={(e) => this.handleChange('password', e.target.value)}
-                                        value={defaultData.password}
-                                        type={showPassword ? 'text' : 'password'}
-                                        InputProps={{
-                                            endAdornment: <InputAdornment position="end">
-                                                <IconButton
-                                                    aria-label="toggle password visibility"
-                                                    onClick={this.handleClickShowPassword}
-                                                    onMouseDown={this.handleMouseDownPassword}
-                                                    edge="end"
-                                                >
-                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        }}
-                                        variant="outlined"
-                                    /><br />
-                                    <TextField
-                                        margin="dense"
-                                        label="Nhập lại mật khẩu"
-                                        id="repeat_password"
-                                        onChange={(e) => this.handleChange('repeat_password', e.target.value)}
-                                        value={defaultData.repeat_password}
-                                        type={showPasswordRepeat ? 'text' : 'password'}
-                                        InputProps={{
-                                            endAdornment: <InputAdornment position="end">
-                                                <IconButton
-                                                    aria-label="toggle password visibility"
-                                                    onClick={this.handleClickShowPasswordRepeat}
-                                                    onMouseDown={this.handleMouseDownPassword}
-                                                    edge="end"
-                                                >
-                                                    {showPasswordRepeat ? <Visibility /> : <VisibilityOff />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        }}
-                                        variant="outlined"
-                                    />
-                                </div>
+                                !success && <FormControl error>
+                                    <FormHelperText 
+                                        style={{fontSize: '1.4rem'}} 
+                                        id="component-error-text"
+                                    >
+                                        { errorMsg }
+                                    </FormHelperText>
+                                </FormControl>
                             }
-                        </form>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={this.handleSave} color="primary">
-                            Lưu
-                        </Button>
-                        <Button onClick={this.handleClose} color="primary">
-                            Hủy
-                        </Button>
-                    </DialogActions>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button color="primary" disabled={!isFormValid} type="submit">
+                                Lưu
+                            </Button>
+                            <Button onClick={this.handleClose} color="primary">
+                                Hủy
+                            </Button>
+                        </DialogActions>
+                    </Formsy>
                 </Dialog>
             </div>
         )
     }
 }
 
-export default MemberDialogEdit;
+const mapStateToProps = (state) => {
+    return {
+        success: state.member.member.success,
+        errorMsg: state.member.member.error
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        saveMember: bindActionCreators(saveMember, dispatch)
+    }
+}
+
+MemberDialogEdit.contextType = AppContext;
+
+export default connect(mapStateToProps, mapDispatchToProps)(React.memo(MemberDialogEdit));

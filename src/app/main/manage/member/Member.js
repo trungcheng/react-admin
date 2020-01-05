@@ -28,6 +28,7 @@ class Member extends Component {
             dialogOpenAdd: false,
             dialogOpenEdit: false,
             dataDetail: [],
+            dataAdd: {},
             dataEdit: {},
             memberList: [
                 { value: '6789', label: '6789' },
@@ -55,10 +56,10 @@ class Member extends Component {
                     isLoading={isFetching}
                     columns={[
                         { title: '#', field: 'idx' },
-                        { title: 'Tên', field: 'fullname' },
-                        { title: 'Tên đăng nhập', field: 'username' },
-                        { title: 'Trạng thái', field: 'statusText' },
-                        { title: 'Mật khẩu 2', field: 'password2' }
+                        { title: 'Tên', field: 'FullName' },
+                        { title: 'Tên đăng nhập', field: 'UserName' },
+                        { title: 'Điện thoại', field: 'Phone' },
+                        { title: 'Trạng thái', field: 'StatusName' }
                     ]}
                     localization={{
                         pagination: {
@@ -269,12 +270,16 @@ class Member extends Component {
     }
 
     render() {
-        const { classes, members, member } = this.props;
+        const { classes, members, member, username } = this.props;
         const { 
             dialogOpenAdd,
             dialogOpenEdit,
+            dataAdd,
             dataEdit
         } = this.state;
+
+        dataAdd.UserName = username;
+        dataEdit.UserName = username;
 
         return (
             <FusePageSimple
@@ -288,7 +293,7 @@ class Member extends Component {
                         { this.renderMemberList(members) }
                         { this.renderMemberDetail(member) }
 
-                        <MemberDialogAdd open={dialogOpenAdd} />
+                        <MemberDialogAdd open={dialogOpenAdd} data={dataAdd} />
                         <MemberDialogEdit open={dialogOpenEdit} data={dataEdit} />
                     </div>
                 }
@@ -299,6 +304,7 @@ class Member extends Component {
 
 const mapStateToProps = (state) => {
     return {
+        username: state.auth.user.data.email,
         isFetching: state.member.member.isFetching,
         members: state.member.member.list,
         member: state.member.member.detail

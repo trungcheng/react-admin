@@ -1,3 +1,4 @@
+import { CreateNew } from './create-new';
 import { Formula } from './formula';
 import { Member } from './member';
 import { Account } from './account';
@@ -9,6 +10,10 @@ export const ManageConfig = {
         }
     },
     routes  : [
+        {
+            path     : '/create-new',
+            component: CreateNew
+        },
         {
             path     : '/formula',
             component: Formula

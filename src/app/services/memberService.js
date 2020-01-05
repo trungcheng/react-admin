@@ -1,5 +1,6 @@
 import axios from 'axios';
 import FuseUtils from '@fuse/FuseUtils';
+import FuseSettingsConfig from 'app/fuse-configs/settingsConfig';
 
 class memberService extends FuseUtils.EventEmitter {
 
@@ -9,49 +10,32 @@ class memberService extends FuseUtils.EventEmitter {
 
     fetchMembers = () => {
         return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                let data = [
-                    {
-                        _id: "5d6ea5f8bc5ee4ef32a81c47",
-                        parent_id: "56850ba0097802b9f2392a24",
-                        active_password2: 0,
-                        status: 0,
-                        roles: 11,
-                        fullname: "6789",
-                        username: "av8883013",
-                        id: "5d6ea5f8bc5ee4ef32a81c47",
-                        msg: null,
-                        msg_link: null,
-                        msg_hidden_friend: null
-                    },
-                    {
-                        _id: "5d6ea4bfbc5ee4ef32a81c24",
-                        parent_id: "56850ba0097802b9f2392a24",
-                        active_password2: 0,
-                        status: 0,
-                        roles: 11,
-                        fullname: "79",
-                        username: "av8883009",
-                        id: "5d6ea4bfbc5ee4ef32a81c24",
-                        msg: null,
-                        msg_link: null,
-                        msg_hidden_friend: null
+            axios.post(`${FuseSettingsConfig.apiUrl}/api/user/GetLstMember`, { keyword: '' })
+                .then(response => {
+                    if (response.data.Result === 1) {
+                        resolve({
+                            status: true,
+                            data: response.data.Data.Data
+                        });
+                    } else {
+                        reject(response.data.Message);
                     }
-                ];
-
-                resolve({
-                    status: true,
-                    data
                 });
-            }, 600);
-            // axios.get('/api/auth/register', data)
-            //     .then(response => {
-            //         if (response.data.user) {
-            //             resolve(response.data.user);
-            //         } else {
-            //             reject(response.data.error);
-            //         }
-            //     });
+        });
+    }
+
+    saveMember = (data) => {
+        return new Promise((resolve, reject) => {
+            axios.post(`${FuseSettingsConfig.apiUrl}/api/user/CreateNewMember`, data)
+                .then(response => {
+                    if (response.data.Result === 1) {
+                        resolve({
+                            status: true
+                        });
+                    } else {
+                        reject(response.data.Message);
+                    }
+                });
         });
     }
 

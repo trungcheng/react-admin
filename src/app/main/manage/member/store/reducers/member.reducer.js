@@ -9,12 +9,15 @@ const member = function (state = {}, action) {
             data = data.map((mem, idx) => {
                 return {
                     ...mem,
-                    idx: idx + 1,
-                    statusText: (mem.status === 0) ? 'Off' : 'On'
+                    idx: idx + 1
                 }
             });
 
             return { ...state, isFetching: false, list: data };
+        case Actions.SAVE_MEMBER_SUCCESS:
+            return { ...state, success: true };
+        case Actions.SAVE_MEMBER_ERROR:
+            return { ...state, success: false, error: action.payload };
         case Actions.FETCH_MEMBER_DETAIL_SUCCESS:
             let dataDetail = action.payload;
             dataDetail = dataDetail.map((mem, idx) => {
