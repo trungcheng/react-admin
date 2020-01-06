@@ -1,0 +1,28 @@
+.member-list {
+    width: 41%;
+    float: left;
+}
+
+.member-detail {
+    width: 57%;
+    float: right;
+}
+
+.username-dialog {
+    width: 65%;
+}
+
+@media screen and (max-width: 768px) {
+    .member-list {
+        width: 100%;
+        margin-bottom: 25px;
+    }
+    
+    .member-detail {
+        width: 100%;
+    }
+    
+    .username-dialog {
+        width: 100%;
+    }
+}

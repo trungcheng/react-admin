@@ -23,21 +23,25 @@ export function fetchMembers() {
     }
 }
 
-export function saveMember(data) {
+export function saveMember(data, cb) {
     return function (dispatch) {
         memberService.saveMember(data)
             .then(response => {
-                    return dispatch({
+                    dispatch({
                         type: Actions.SAVE_MEMBER_SUCCESS,
                         payload: response.status
                     });
+
+                    return cb(true);
                 }
             )
             .catch(error => {
-                return dispatch({
+                dispatch({
                     type: Actions.SAVE_MEMBER_ERROR,
                     payload: error
                 });
+
+                return cb(false);
             });
     }
 }

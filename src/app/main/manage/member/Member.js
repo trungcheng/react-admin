@@ -25,8 +25,8 @@ class Member extends Component {
         super(props);
 
         this.state = {
-            dialogOpenAdd: false,
-            dialogOpenEdit: false,
+            mode: null,
+            open: false,
             dataDetail: [],
             dataAdd: {},
             dataEdit: {},
@@ -45,6 +45,32 @@ class Member extends Component {
         this.props.fetchMembers();
     }
 
+    openDialogAdd = () => {
+		this.setState({
+			mode: 'add',
+			open: true
+		});
+    }
+    
+    openDialogEdit = (dataEdit) => {
+		this.setState({
+			mode: 'edit',
+            open: true,
+            dataEdit
+		});
+	}
+
+    handleClose = () => {
+        this.setState({
+            open: false,
+            mode: null
+		});
+    }
+
+    handleRefresh = () => {
+        this.props.fetchMembers();
+    }
+
     renderMemberList = (members) => {
         const { isFetching } = this.props;
 
@@ -54,8 +80,10 @@ class Member extends Component {
                     xs={12}
                     title="Danh sách thành viên"
                     isLoading={isFetching}
+                    data={members} 
                     columns={[
                         { title: '#', field: 'idx' },
+                        { title: 'ID', field: 'UserID', hidden: true },
                         { title: 'Tên', field: 'FullName' },
                         { title: 'Tên đăng nhập', field: 'UserName' },
                         { title: 'Điện thoại', field: 'Phone' },
@@ -91,9 +119,9 @@ class Member extends Component {
                             }
                         }
                     }}
-                    data={members} 
                     options={{
-                        actionsColumnIndex: 5
+                        actionsColumnIndex: 5,
+                        pageSize: 10
                     }}
                     actions={[
                         {
@@ -101,28 +129,21 @@ class Member extends Component {
                             tooltip: 'Thêm mới',
                             isFreeAction: true,
                             onClick: () => {
-                                this.setState({
-                                    dialogOpenAdd: true,
-                                    dialogOpenEdit: false
-                                });
+                                this.openDialogAdd();
                             }
                         },
                         {
                             icon: 'edit',
                             tooltip: 'Chỉnh sửa',
                             onClick: (event, rowData) => {
-                                this.setState({ 
-                                    dialogOpenAdd: false,
-                                    dialogOpenEdit: true,
-                                    dataEdit: rowData
-                                });
+                                this.openDialogEdit(rowData);
                             }
                         }
                     ]}
                     onRowClick={(event, rowData) => {
                         this.setState({
-                            dialogOpenAdd: false,
-                            dialogOpenEdit: false
+                            open: false,
+                            mode: null
                         }, () => {
                             this.props.fetchDetail(rowData.id);
                         });
@@ -272,14 +293,14 @@ class Member extends Component {
     render() {
         const { classes, members, member, username } = this.props;
         const { 
-            dialogOpenAdd,
-            dialogOpenEdit,
+            mode,
+            open,
             dataAdd,
             dataEdit
         } = this.state;
 
-        dataAdd.UserName = username;
-        dataEdit.UserName = username;
+        dataAdd.AuthUserName = username;
+        dataEdit.AuthUserName = username;
 
         return (
             <FusePageSimple
@@ -293,8 +314,18 @@ class Member extends Component {
                         { this.renderMemberList(members) }
                         { this.renderMemberDetail(member) }
 
-                        <MemberDialogAdd open={dialogOpenAdd} data={dataAdd} />
-                        <MemberDialogEdit open={dialogOpenEdit} data={dataEdit} />
+                        <MemberDialogAdd 
+                            open={mode == 'add' && open} 
+                            onClose={this.handleClose}
+                            onRefresh={this.handleRefresh}
+                            data={dataAdd} 
+                        />
+                        <MemberDialogEdit 
+                            open={mode == 'edit' && open}
+                            onClose={this.handleClose}
+                            onRefresh={this.handleRefresh}
+                            data={dataEdit} 
+                        />
                     </div>
                 }
             />
