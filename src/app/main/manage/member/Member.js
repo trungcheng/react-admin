@@ -12,7 +12,8 @@ import MemberDialogEdit from './MemberDialogEdit';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { fetchMembers, fetchDetail } from './store/actions';
+import { fetchMembers, saveMember, fetchDetail } from './store/actions';
+import * as Actions from 'app/store/actions';
 import AppContext from 'app/AppContext';
 
 const styles = theme => ({
@@ -42,7 +43,7 @@ class Member extends Component {
     }
 
     componentWillMount() {
-        this.props.fetchMembers();
+        this.handleRefresh();
     }
 
     openDialogAdd = () => {
@@ -115,7 +116,7 @@ class Member extends Component {
                             editRow: {
                                 cancelTooltip: 'Hủy',
                                 saveTooltip: 'Xác nhận',
-                                deleteText: 'Bạn có chắc chắn muốn xóa?'
+                                deleteText: 'Bạn có chắc chắn muốn xóa ?'
                             }
                         }
                     }}
@@ -149,17 +150,21 @@ class Member extends Component {
                         });
                     }}
                     editable={{
-                        onRowDelete: oldData =>
-                            new Promise(resolve => {
-                                setTimeout(() => {
-                                    resolve();
-                                    this.setState(prevState => {
-                                        const data = [...prevState.data];
-                                        data.splice(data.indexOf(oldData), 1);
-                                        return { ...prevState, data };
-                                    });
-                                }, 600);
-                            }),
+                        onRowDelete: oldData => {
+                            oldData.Status = 1111;
+                            return new Promise((resolve, reject) => {
+                                this.props.saveMember(oldData, (status) => {
+                                    if (status) {
+                                        this.handleRefresh();
+                                        this.props.showMessage({ message: 'Xóa thành công' });
+                                        resolve();
+                                    } else {
+                                        this.props.showMessage({ message: 'Xóa không thành công' });
+                                        reject();
+                                    }
+                                });
+                            });
+                        }
                     }}
                 />
             </div>
@@ -324,7 +329,7 @@ class Member extends Component {
                             open={mode == 'edit' && open}
                             onClose={this.handleClose}
                             onRefresh={this.handleRefresh}
-                            data={dataEdit} 
+                            data={dataEdit}
                         />
                     </div>
                 }
@@ -345,7 +350,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         fetchMembers: bindActionCreators(fetchMembers, dispatch),
-        fetchDetail: bindActionCreators(fetchDetail, dispatch)
+        fetchDetail: bindActionCreators(fetchDetail, dispatch),
+        saveMember: bindActionCreators(saveMember, dispatch),
+        showMessage: bindActionCreators(Actions.showMessage, dispatch)
     }
 }
 

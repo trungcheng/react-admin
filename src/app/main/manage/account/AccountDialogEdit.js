@@ -11,14 +11,16 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import { TextFieldFormsy, CheckboxFormsy } from '@fuse';
+import Formsy from 'formsy-react';
 // import Input from '@material-ui/core/Input';
 // import FilledInput from '@material-ui/core/FilledInput';
 // import OutlinedInput from '@material-ui/core/OutlinedInput';
 // import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
 // import FormGroup from '@material-ui/core/FormGroup';
-// import FormHelperText from '@material-ui/core/FormHelperText';
-// import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
@@ -26,26 +28,35 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { saveAccount, fetchDetail, getAccountByCompanyId } from './store/actions';
+import * as Actions from 'app/store/actions';
+import AppContext from 'app/AppContext';
+
 class AccountDialogEdit extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            openMode: props.open,
             showPassword: false,
+            isFormValid: false,
+            showRes: false,
             defaultData: {
-                company: 1,
-                account: 0,
-                sub_user: '',
-                password: '',
-                safe_code: '',
-                note: '',
-                status: true
+                AccountID: props.data.AccountID,
+                CompanyID: 1,
+                ParentID: 0,
+                AccountName: '',
+                UserName: '',
+                Password: '',
+                SecretCode: '',
+                Note: '',
+                Status: 1
             },
             statusList: [
-                { value: true, label: 'True' },
-                { value: false, label: 'False' }
+                { value: 1, label: 'True' },
+                { value: 0, label: 'False' }
             ],
             accountList: [
                 { value: 0, label: 'Tài khoản gốc' },
@@ -54,19 +65,17 @@ class AccountDialogEdit extends Component {
                 { value: 3, label: 'dtf39' }
             ],
             companyList: [
-                { value: 1, label: 'bong88' },
-                { value: 2, label: 'sbobet' },
-                { value: 3, label: '3in1bet' }
+                { value: 1, label: '3In' },
+                { value: 2, label: 'LD' },
+                { value: 3, label: 'New789' },
+                { value: 4, label: 'Sbobet' },
+                { value: 5, label: 'Viet88' },
+                { value: 6, label: 'Bong88' }
             ]
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.open !== this.state.open) {
-            this.setState({
-                openMode: nextProps.open
-            });
-        }
         if (nextProps.data !== this.state.defaultData) {
             this.setState({
                 defaultData: {
@@ -78,20 +87,39 @@ class AccountDialogEdit extends Component {
     }
 
     handleClose = () => {
+        const { onClose } = this.props;
+
         this.setState({
-            openMode: false,
             showPassword: false,
-            data: {
-                ...this.state.data,
-                status: true
+            defaultData: {
+                ...this.state.defaultData,
+                Status: 1
             }
         });
+
+        onClose();
+    }
+
+    handleRefresh = () => {
+        const { onRefresh } = this.props;
+
+        onRefresh();
     }
 
     handleSave = () => {
         const { defaultData } = this.state;
         
-        console.log(defaultData);
+        this.setState({
+            showRes: true
+        }, () => {
+            this.props.saveAccount(defaultData, (status) => {
+                if (status) {
+                    this.handleRefresh();
+                    this.handleClose();
+                    this.props.showMessage({ message: 'Cập nhật thành công' });
+                }
+            });
+        });
     }
 
     handleChange = (field, value) => {
@@ -114,10 +142,24 @@ class AccountDialogEdit extends Component {
         e.preventDefault();
     };
 
+    disableButton = () => {
+        this.setState({
+            isFormValid: false
+        });
+    }
+
+    enableButton = () => {
+        this.setState({
+            isFormValid: true
+        });
+    }
+
     render() {
+        const { open, success, errorMsg } = this.props;
         const { 
-            openMode, 
-            showPassword, 
+            showRes,
+            showPassword,
+            isFormValid, 
             defaultData,
             statusList,
             accountList,
@@ -127,15 +169,21 @@ class AccountDialogEdit extends Component {
         return (
             <div>
                 <Dialog
-                    open={openMode}
+                    open={open}
                     fullWidth={true}
                     maxWidth={'sm'}
                     onClose={this.handleClose}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Cập nhật tài khoản</DialogTitle>
-                    <DialogContent>
-                        <form noValidate autoComplete="off">
+                    <Formsy
+                        onValidSubmit={this.handleSave}
+                        onValid={this.enableButton}
+                        onInvalid={this.disableButton}
+                        ref={c => this.refForm = c}
+                        className="flex flex-col justify-center w-full"
+                    >
+                        <DialogTitle id="form-dialog-title">Cập nhật tài khoản</DialogTitle>
+                        <DialogContent>
 
                             <TextField
                                 fullWidth
@@ -252,21 +300,63 @@ class AccountDialogEdit extends Component {
                                     </MenuItem>
                                 ))}
                             </TextField>
-                                    
-                        </form>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={this.handleSave} color="primary">
-                            Lưu
-                        </Button>
-                        <Button onClick={this.handleClose} color="primary">
-                            Hủy
-                        </Button>
-                    </DialogActions>
+                                        
+                            {
+                                !success && showRes && <FormControl error>
+                                    <FormHelperText 
+                                        style={{fontSize: '1.4rem'}} 
+                                        id="component-error-text"
+                                    >
+                                        { errorMsg }
+                                    </FormHelperText>
+                                </FormControl>
+                            }
+
+                            {
+                                success && showRes && <FormControl>
+                                    <FormHelperText 
+                                        style={{
+                                            fontSize: '1.4rem',
+                                            color: 'green'
+                                        }} 
+                                        id="component-success-text"
+                                    >
+                                        Cập nhật thành công
+                                    </FormHelperText>
+                                </FormControl>
+                            }
+                        </DialogContent>
+                        <DialogActions>
+                            <Button color="primary" disabled={!isFormValid} type="submit">
+                                Lưu
+                            </Button>
+                            <Button onClick={this.handleClose} color="primary">
+                                Hủy
+                            </Button>
+                        </DialogActions>
+                    </Formsy>
                 </Dialog>
             </div>
         )
     }
 }
 
-export default AccountDialogEdit;
+const mapStateToProps = (state) => {
+    return {
+        success: state.account.account.success,
+        errorMsg: state.account.account.error
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        saveAccount: bindActionCreators(saveAccount, dispatch),
+        fetchDetail: bindActionCreators(fetchDetail, dispatch),
+        showMessage: bindActionCreators(Actions.showMessage, dispatch),
+        getAccountByCompanyId: bindActionCreators(getAccountByCompanyId, dispatch)
+    }
+}
+
+AccountDialogEdit.contextType = AppContext;
+
+export default connect(mapStateToProps, mapDispatchToProps)(React.memo(AccountDialogEdit));

@@ -40,6 +40,7 @@ class MemberDialogAdd extends Component {
         super(props);
 
         this.state = {
+            showRes: false,
             showPassword: false,
             showPasswordRepeat: false,
             isFormValid: false,
@@ -64,7 +65,7 @@ class MemberDialogAdd extends Component {
             this.setState({
                 defaultData: {
                     ...this.state.defaultData,
-                    ...nextProps.data
+                    AuthUserName: nextProps.data.AuthUserName
                 }
             });
         }
@@ -94,17 +95,19 @@ class MemberDialogAdd extends Component {
     handleSave = () => {
         const { defaultData } = this.state;
 
+        let data;
         defaultData.Status = defaultData.Status ? 1 : 0; 
         defaultData.UserName = defaultData.AuthUserName + defaultData.Code1 + defaultData.Code2 + defaultData.Code3;
+        data = _.merge(data, defaultData);
         
         this.setState({
             showRes: true
         }, () => {
-            this.props.saveMember(defaultData, (status) => {
+            this.props.saveMember(data, (status) => {
                 if (status) {
-                    // this.handleClose();
-                    // this.handleRefresh();
-                    // this.props.showMessage({ message: 'Cập nhật thành công' });
+                    this.handleRefresh();
+                    this.handleClose();
+                    this.props.showMessage({ message: 'Thêm mới thành công' });
                 }
             });
         });
@@ -151,11 +154,18 @@ class MemberDialogAdd extends Component {
     render() {
         const { open, success, error } = this.props;
         const { 
+            showRes,
             showPassword, 
             showPasswordRepeat,
             isFormValid, 
             defaultData
         } = this.state;
+
+        if (defaultData.Status == 0) {
+            defaultData.Status = false;
+        } else if (defaultData.Status == 1) {
+            defaultData.Status = true;
+        }
 
         return (
             <div>
@@ -218,7 +228,7 @@ class MemberDialogAdd extends Component {
                                     id="Code1"
                                     select
                                     value={defaultData.Code1}
-                                    onChange={(e) => this.handleChange('Code1', e)}
+                                    onChange={(e) => this.handleChange('Code1', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -232,7 +242,7 @@ class MemberDialogAdd extends Component {
                                     id="Code2"
                                     select
                                     value={defaultData.Code2}
-                                    onChange={(e) => this.handleChange('Code2', e)}
+                                    onChange={(e) => this.handleChange('Code2', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -246,7 +256,7 @@ class MemberDialogAdd extends Component {
                                     id="Code3"
                                     select
                                     value={defaultData.Code3}
-                                    onChange={(e) => this.handleChange('Code3', e)}
+                                    onChange={(e) => this.handleChange('Code3', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -284,10 +294,10 @@ class MemberDialogAdd extends Component {
                                 value={defaultData.Status}
                                 color="primary"
                                 label="Trạng thái (Hoạt động/Khóa)"
-                            />
+                            /><br />
 
                             {
-                                defaultData.Status && <div>
+                                (defaultData.Status == true || defaultData.Status == 1) && <div>
                                     <TextFieldFormsy
                                         className="mb-10"
                                         fullWidth
@@ -353,7 +363,7 @@ class MemberDialogAdd extends Component {
                             }
 
                             {
-                                !success && <FormControl error>
+                                !success && showRes && <FormControl error>
                                     <FormHelperText 
                                         style={{fontSize: '1.4rem'}} 
                                         id="component-error-text"
@@ -364,7 +374,7 @@ class MemberDialogAdd extends Component {
                             }
 
                             {
-                                success && <FormControl success>
+                                success && showRes && <FormControl>
                                     <FormHelperText 
                                         style={{
                                             fontSize: '1.4rem',
@@ -372,7 +382,7 @@ class MemberDialogAdd extends Component {
                                         }}
                                         id="component-success-text"
                                     >
-                                        Thêm mới thành viên thành công
+                                        Thêm mới thành công
                                     </FormHelperText>
                                 </FormControl>
                             }
@@ -401,7 +411,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        saveMember: bindActionCreators(saveMember, dispatch)
+        saveMember: bindActionCreators(saveMember, dispatch),
+        showMessage: bindActionCreators(Actions.showMessage, dispatch)
     }
 }
 

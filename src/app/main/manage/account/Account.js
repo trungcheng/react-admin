@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { FusePageSimple } from '@fuse';
 import { withRouter } from 'react-router-dom';
+import clsx from 'clsx';
 
 import MaterialTable from 'material-table';
 import AccountDialogAdd from './AccountDialogAdd';
@@ -9,7 +10,8 @@ import AccountDialogEdit from './AccountDialogEdit';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { fetchAccounts, fetchDetail } from './store/actions';
+import { fetchAccounts, saveAccount, fetchDetail } from './store/actions';
+import * as Actions from 'app/store/actions';
 import AppContext from 'app/AppContext';
 
 const styles = theme => ({
@@ -22,14 +24,40 @@ class Account extends Component {
         super(props);
 
         this.state = {
-            dialogOpenAdd: false,
-            dialogOpenEdit: false,
+            mode: null,
+            open: false,
             dataDetail: [],
             dataEdit: {}
         };
     }
 
     componentWillMount() {
+        this.handleRefresh();
+    }
+
+    openDialogAdd = () => {
+		this.setState({
+			mode: 'add',
+			open: true
+		});
+    }
+    
+    openDialogEdit = (dataEdit) => {
+		this.setState({
+			mode: 'edit',
+            open: true,
+            dataEdit
+		});
+	}
+
+    handleClose = () => {
+        this.setState({
+            open: false,
+            mode: null
+		});
+    }
+
+    handleRefresh = () => {
         this.props.fetchAccounts();
     }
 
@@ -42,10 +70,10 @@ class Account extends Component {
                 isLoading={isFetching}
                 columns={[
                     { title: '#', field: 'idx' },
-                    { title: 'Tên tài khoản', field: 'acc_name' },
-                    { title: 'Tên đăng nhập', field: 'sub_user' },
-                    { title: 'Công ty', field: 'banker_name' },
-                    { title: 'Trạng thái', field: 'statusText' }
+                    { title: 'Tên tài khoản', field: 'AccountName' },
+                    { title: 'Tên đăng nhập', field: 'UserName' },
+                    { title: 'Công ty', field: 'CompanyName' },
+                    { title: 'Trạng thái', field: 'StatusName' }
                 ]}
                 localization={{
                     pagination: {
@@ -73,14 +101,15 @@ class Account extends Component {
                         editRow: {
                             cancelTooltip: 'Hủy',
                             saveTooltip: 'Xác nhận',
-                            deleteText: 'Bạn có chắc chắn muốn xóa?'
+                            deleteText: 'Bạn có chắc chắn muốn xóa ?'
                         }
                     }
                 }}
                 data={accounts}
-                parentChildData={(row, rows) => rows.find(a => a.id === row.acc_parent_id)}
+                parentChildData={(row, rows) => rows.find(a => a.AccountID === row.ParentID)}
                 options={{
-                    actionsColumnIndex: 5
+                    actionsColumnIndex: 5,
+                    pageSize: 10
                 }}
                 actions={[
                     {
@@ -88,36 +117,33 @@ class Account extends Component {
                         tooltip: 'Thêm mới',
                         isFreeAction: true,
                         onClick: () => {
-                            this.setState({
-                                dialogOpenAdd: true,
-                                dialogOpenEdit: false
-                            });
+                            this.openDialogAdd();
                         }
                     },
                     {
                         icon: 'edit',
                         tooltip: 'Chỉnh sửa',
                         onClick: (event, rowData) => {
-                            this.setState({ 
-                                dialogOpenAdd: false,
-                                dialogOpenEdit: true,
-                                dataEdit: rowData
-                            });
+                            this.openDialogEdit(rowData);
                         }
                     }
                 ]}
                 editable={{
-                    onRowDelete: oldData =>
-                        new Promise(resolve => {
-                            setTimeout(() => {
-                                resolve();
-                                this.setState(prevState => {
-                                    const data = [...prevState.data];
-                                    data.splice(data.indexOf(oldData), 1);
-                                    return { ...prevState, data };
-                                });
-                            }, 600);
-                        }),
+                    onRowDelete: oldData => {
+                        oldData.Status = 1111;
+                        return new Promise((resolve, reject) => {
+                            this.props.saveAccount(oldData, (status) => {
+                                if (status) {
+                                    this.handleRefresh();
+                                    this.props.showMessage({ message: 'Xóa thành công' });
+                                    resolve();
+                                } else {
+                                    this.props.showMessage({ message: 'Xóa không thành công' });
+                                    reject();
+                                }
+                            });
+                        });
+                    }
                 }}
             />
         );
@@ -126,8 +152,8 @@ class Account extends Component {
     render() {
         const { classes, accounts } = this.props;
         const { 
-            dialogOpenAdd,
-            dialogOpenEdit,
+            mode,
+            open,
             dataEdit
         } = this.state;
 
@@ -142,8 +168,18 @@ class Account extends Component {
                         <br />
                         { this.renderAccountList(accounts) }
 
-                        <AccountDialogAdd open={dialogOpenAdd} />
-                        <AccountDialogEdit open={dialogOpenEdit} data={dataEdit} />
+                        <AccountDialogAdd 
+                            open={mode == 'add' && open} 
+                            onClose={this.handleClose}
+                            onRefresh={this.handleRefresh}
+                        />
+
+                        <AccountDialogEdit 
+                            open={mode == 'edit' && open} 
+                            onClose={this.handleClose}
+                            onRefresh={this.handleRefresh}
+                            data={dataEdit} 
+                        />
                     </div>
                 }
             />
@@ -162,7 +198,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         fetchAccounts: bindActionCreators(fetchAccounts, dispatch),
-        fetchDetail: bindActionCreators(fetchDetail, dispatch)
+        fetchDetail: bindActionCreators(fetchDetail, dispatch),
+        saveAccount: bindActionCreators(saveAccount, dispatch),
+        showMessage: bindActionCreators(Actions.showMessage, dispatch)
     }
 }
 

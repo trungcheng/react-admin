@@ -11,20 +11,28 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import { TextFieldFormsy, CheckboxFormsy } from '@fuse';
+import Formsy from 'formsy-react';
 // import Input from '@material-ui/core/Input';
 // import FilledInput from '@material-ui/core/FilledInput';
 // import OutlinedInput from '@material-ui/core/OutlinedInput';
 // import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
 // import FormGroup from '@material-ui/core/FormGroup';
-// import FormHelperText from '@material-ui/core/FormHelperText';
-// import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { saveAccount, fetchDetail, getAccountByCompanyId } from './store/actions';
+import * as Actions from 'app/store/actions';
+import AppContext from 'app/AppContext';
 
 class MemberDialogAdd extends Component {
 

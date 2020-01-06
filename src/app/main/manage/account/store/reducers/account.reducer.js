@@ -9,22 +9,19 @@ const account = function (state = {}, action) {
             data = data.map((acc, idx) => {
                 return {
                     ...acc,
-                    idx: idx + 1,
-                    statusText: acc.is_active ? 'true' : 'false'
-                }
-            });
-
-            return { ...state, isFetching: false, list: data };
-        case Actions.FETCH_ACCOUNT_DETAIL_SUCCESS:
-            let dataDetail = action.payload;
-            dataDetail = dataDetail.map((acc, idx) => {
-                return {
-                    ...acc,
                     idx: idx + 1
                 }
             });
 
-            return { ...state, detail: dataDetail };
+            return { ...state, isFetching: false, list: data };
+        case Actions.SAVE_ACCOUNT_SUCCESS:
+            return { ...state, success: true };
+        case Actions.SAVE_ACCOUNT_ERROR:
+            return { ...state, success: false, error: action.payload };
+        case Actions.FETCH_ACCOUNT_DETAIL_SUCCESS:
+            return { ...state, detail: action.payload };
+        case Actions.GET_ACCOUNT_BY_COMPANY_SUCCESS:
+            return { ...state, accountList: action.payload }
         default:
             return state;
     }

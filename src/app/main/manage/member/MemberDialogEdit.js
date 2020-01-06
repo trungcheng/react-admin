@@ -122,8 +122,8 @@ class MemberDialogEdit extends Component {
         }, () => {
             this.props.saveMember(data, (status) => {
                 if (status) {
-                    this.handleClose();
                     this.handleRefresh();
+                    this.handleClose();
                     this.props.showMessage({ message: 'Cập nhật thành công' });
                 }
             });
@@ -248,7 +248,7 @@ class MemberDialogEdit extends Component {
                                     id="Code1"
                                     select
                                     value={defaultData.Code1}
-                                    onChange={(e) => this.handleChange('Code1', e)}
+                                    onChange={(e) => this.handleChange('Code1', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -263,7 +263,7 @@ class MemberDialogEdit extends Component {
                                     id="Code2"
                                     select
                                     value={defaultData.Code2}
-                                    onChange={(e) => this.handleChange('Code2', e)}
+                                    onChange={(e) => this.handleChange('Code2', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -278,7 +278,7 @@ class MemberDialogEdit extends Component {
                                     id="Code3"
                                     select
                                     value={defaultData.Code3}
-                                    onChange={(e) => this.handleChange('Code3', e)}
+                                    onChange={(e) => this.handleChange('Code3', e.target.value)}
                                     variant="outlined"
                                 >
                                     {_.range(0, 10).map(value => (
@@ -337,7 +337,7 @@ class MemberDialogEdit extends Component {
                             /><br />
 
                             {
-                                ((defaultData.Status == true || defaultData.Status == 0) && changePwdCondition) && <div>
+                                ((defaultData.Status == true || defaultData.Status == 1) && changePwdCondition) && <div>
                                     <TextFieldFormsy
                                         className="mb-10"
                                         fullWidth
@@ -420,7 +420,7 @@ class MemberDialogEdit extends Component {
                                         }} 
                                         id="component-success-text"
                                     >
-                                        Cập nhật thành viên thành công
+                                        Cập nhật thành công
                                     </FormHelperText>
                                 </FormControl>
                             }
