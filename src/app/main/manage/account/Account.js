@@ -70,6 +70,7 @@ class Account extends Component {
                 isLoading={isFetching}
                 columns={[
                     { title: '#', field: 'idx' },
+                    { title: 'ID', field: 'AccountID', hidden: true },
                     { title: 'Tên tài khoản', field: 'AccountName' },
                     { title: 'Tên đăng nhập', field: 'UserName' },
                     { title: 'Công ty', field: 'CompanyName' },
@@ -154,6 +155,7 @@ class Account extends Component {
         const { 
             mode,
             open,
+            dataAdd,
             dataEdit
         } = this.state;
 
@@ -172,6 +174,7 @@ class Account extends Component {
                             open={mode == 'add' && open} 
                             onClose={this.handleClose}
                             onRefresh={this.handleRefresh}
+                            data={dataAdd} 
                         />
 
                         <AccountDialogEdit 

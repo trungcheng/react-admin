@@ -96,7 +96,17 @@ class MemberDialogEdit extends Component {
             changePwdCondition: false,
             defaultData: {
                 ...this.state.defaultData,
-                Pwd2: false
+                FullName: '',
+                UserName: '',
+                AuthUserName: '',
+                Code1: 0,
+                Code2: 0,
+                Code3: 0,
+                Phone: '',
+                Status: false,
+                Pwd2: false,
+                Password: '',
+                Repeat_Password: ''
             }
         });
 

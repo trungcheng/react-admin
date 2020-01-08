@@ -75,11 +75,21 @@ class MemberDialogAdd extends Component {
         const { onClose } = this.props;
 
 		this.setState({
+            showRes: false,
             showPassword: false,
             showPasswordRepeat: false,
             defaultData: {
-                ...this.state.defaultData,
-                Status: false
+                UserID: 0,
+                FullName: '',
+                UserName: '',
+                AuthUserName: '',
+                Code1: 0,
+                Code2: 0,
+                Code3: 0,
+                Phone: '',
+                Status: false,
+                Password: '',
+                Repeat_Password: ''
             }
         });
 

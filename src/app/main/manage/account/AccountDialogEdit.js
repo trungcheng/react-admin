@@ -58,12 +58,7 @@ class AccountDialogEdit extends Component {
                 { value: 1, label: 'True' },
                 { value: 0, label: 'False' }
             ],
-            accountList: [
-                { value: 0, label: 'Tài khoản gốc' },
-                { value: 1, label: 'dtf35b118' },
-                { value: 2, label: 'dtf3630' },
-                { value: 3, label: 'dtf39' }
-            ],
+            accountListByCompany: [],
             companyList: [
                 { value: 1, label: '3In' },
                 { value: 2, label: 'LD' },
@@ -82,8 +77,22 @@ class AccountDialogEdit extends Component {
                     ...this.state.defaultData,
                     ...nextProps.data
                 }
+            }, () => {
+                this.handleAccountByCompany(this.state.defaultData.CompanyID);
             });
         }
+    }
+
+    handleAccountByCompany = (companyId) => {
+        const { defaultData } = this.state;
+
+        this.props.getAccountByCompanyId(companyId, (res) => {
+            if (res.status) {
+                this.setState({
+                    accountListByCompany: res.data.filter(item => item.ID !== defaultData.AccountID)
+                });
+            }
+        });
     }
 
     handleClose = () => {
@@ -91,8 +100,17 @@ class AccountDialogEdit extends Component {
 
         this.setState({
             showPassword: false,
+            isFormValid: false,
+            showRes: false,
             defaultData: {
                 ...this.state.defaultData,
+                CompanyID: 1,
+                ParentID: 0,
+                AccountName: '',
+                UserName: '',
+                Password: '',
+                SecretCode: '',
+                Note: '',
                 Status: 1
             }
         });
@@ -126,6 +144,9 @@ class AccountDialogEdit extends Component {
         const { defaultData } = this.state;
 
         defaultData[field] = value;
+        if (field === 'CompanyID') {
+            this.handleAccountByCompany(value);
+        }
 
         this.setState({
             defaultData
@@ -162,7 +183,7 @@ class AccountDialogEdit extends Component {
             isFormValid, 
             defaultData,
             statusList,
-            accountList,
+            accountListByCompany,
             companyList
         } = this.state;
 
@@ -186,15 +207,15 @@ class AccountDialogEdit extends Component {
                         <DialogContent>
 
                             <TextField
+                                className="mb-10"
                                 fullWidth
-                                margin="dense"
-                                id="company"
+                                required
+                                id="CompanyID"
                                 label="Công ty"
                                 select
-                                value={defaultData.company}
-                                onChange={(e) => this.handleChange('company', e.target.value)}
+                                value={defaultData.CompanyID}
+                                onChange={(e) => this.handleChange('CompanyID', e.target.value)}
                                 variant="outlined"
-                                style={{marginBottom: 10}}
                             >
                                 {companyList.map(option => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -204,102 +225,138 @@ class AccountDialogEdit extends Component {
                             </TextField>
 
                             <TextField
-                                fullWidth
-                                margin="dense"
-                                id="account"
-                                label="Thuộc tài khoản"
-                                select
-                                value={defaultData.account}
-                                onChange={(e) => this.handleChange('account', e.target.value)}
-                                variant="outlined"
-                                style={{marginBottom: 10}}
-                            >
-                                {accountList.map(option => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label.toUpperCase()}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-
-                            <TextField
+                                className="mb-10"
                                 fullWidth
                                 required
-                                margin="dense"
-                                id="sub_user"
-                                label="Tên đăng nhập"
-                                onChange={(e) => this.handleChange('sub_user', e.target.value)}
-                                value={defaultData.sub_user}
-                                type="text"
+                                id="ParentID"
+                                label="Thuộc tài khoản"
+                                select
+                                value={defaultData.ParentID}
+                                onChange={(e) => this.handleChange('ParentID', e.target.value)}
                                 variant="outlined"
-                                style={{marginBottom: 10}}
-                            />
+                            >
+                                {
+                                    accountListByCompany.length > 0 && accountListByCompany.map(option => (
+                                        <MenuItem key={option.ID} value={option.ID}>
+                                            {option.Name.toUpperCase()}
+                                        </MenuItem>
+                                    ))
+                                }
+                            </TextField>
 
-                            <TextField
-                                fullWidth
-                                margin="dense"
-                                label="Mật khẩu"
-                                id="password"
-                                onChange={(e) => this.handleChange('password', e.target.value)}
-                                value={defaultData.password}
-                                type={showPassword ? 'text' : 'password'}
-                                InputProps={{
-                                    endAdornment: <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={this.handleClickShowPassword}
-                                            onMouseDown={this.handleMouseDownPassword}
-                                            edge="end"
-                                        >
-                                            {showPassword ? <Visibility /> : <VisibilityOff />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }}
-                                variant="outlined"
-                                style={{marginBottom: 10}}
-                            />
+                            {
+                                defaultData.ParentID == 0 && <div>
+                                    <TextFieldFormsy
+                                        className="mb-10"
+                                        fullWidth
+                                        required
+                                        name="UserName"
+                                        label="Tên đăng nhập"
+                                        onChange={(e) => this.handleChange('UserName', e.target.value)}
+                                        validations={{
+                                            minLength: 4
+                                        }}
+                                        validationErrors={{
+                                            minLength: 'Tên đăng nhập tối thiểu 4 kí tự'
+                                        }}
+                                        value={defaultData.UserName}
+                                        type="text"
+                                        variant="outlined"
+                                    />
 
-                            <TextField
+                                    <TextFieldFormsy
+                                        className="mb-10"
+                                        fullWidth
+                                        label="Mật khẩu"
+                                        name="Password"
+                                        onChange={(e) => this.handleChange('Password', e.target.value)}
+                                        validations={{
+                                            minLength: 6
+                                        }}
+                                        validationErrors={{
+                                            minLength: 'Mật khẩu tối thiểu 6 kí tự'
+                                        }}
+                                        value={defaultData.Password}
+                                        type={showPassword ? 'text' : 'password'}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={this.handleClickShowPassword}
+                                                    onMouseDown={this.handleMouseDownPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        }}
+                                        variant="outlined"
+                                    />
+                                </div>
+                            }
+
+                            {
+                                defaultData.ParentID > 0 && <TextFieldFormsy
+                                    className="mb-10"
+                                    fullWidth
+                                    required
+                                    name="AccountName"
+                                    label="Tên tài khoản"
+                                    onChange={(e) => this.handleChange('AccountName', e.target.value)}
+                                    validations={{
+                                        minLength: 4
+                                    }}
+                                    validationErrors={{
+                                        minLength: 'Tên tài khoản tối thiểu 4 kí tự'
+                                    }}
+                                    value={defaultData.AccountName}
+                                    type="text"
+                                    variant="outlined"
+                                /> 
+                            }
+
+                            <TextFieldFormsy
+                                className="mb-10"
                                 fullWidth
-                                margin="dense"
-                                id="safe_code"
+                                required
+                                name="SecretCode"
                                 label="Mã an toàn"
-                                onChange={(e) => this.handleChange('safe_code', e.target.value)}
-                                value={defaultData.safe_code}
+                                onChange={(e) => this.handleChange('SecretCode', e.target.value)}
+                                value={defaultData.SecretCode}
                                 type="text"
                                 variant="outlined"
-                                style={{marginBottom: 10}}
                             />
 
-                            <TextField
+                            <TextFieldFormsy
+                                className="mb-10"
                                 fullWidth
-                                margin="dense"
-                                id="note"
+                                required
+                                name="Note"
                                 label="Chú thích"
-                                onChange={(e) => this.handleChange('note', e.target.value)}
-                                value={defaultData.note}
+                                onChange={(e) => this.handleChange('Note', e.target.value)}
+                                value={defaultData.Note}
                                 type="text"
                                 variant="outlined"
-                                style={{marginBottom: 10}}
                             />
 
-                            <TextField
+                            <TextFieldFormsy
+                                className="mb-10"
                                 fullWidth
+                                required
                                 disabled
-                                margin="dense"
-                                id="status"
+                                name="Status"
                                 label="Trạng thái"
                                 select
-                                value={defaultData.status}
-                                onChange={(e) => this.handleChange('status', e.target.value)}
+                                value={defaultData.Status}
+                                onChange={(e) => this.handleChange('Status', e.target.value)}
                                 variant="outlined"
-                                style={{marginBottom: 10}}
                             >
                                 {statusList.map(option => (
                                     <MenuItem key={option.value} value={option.value}>
                                         {option.label}
                                     </MenuItem>
                                 ))}
-                            </TextField>
+                            </TextFieldFormsy>
                                         
                             {
                                 !success && showRes && <FormControl error>

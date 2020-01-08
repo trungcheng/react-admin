@@ -90,7 +90,6 @@ class CreateNew extends Component {
                 <form noValidate autoComplete="off">
                     <TextField
                         fullWidth
-                        margin="dense"
                         id="account"
                         label="Tài khoản"
                         select
@@ -109,7 +108,6 @@ class CreateNew extends Component {
 
                     <TextField
                         fullWidth
-                        margin="dense"
                         id="member"
                         label="Thành viên"
                         select
@@ -128,7 +126,6 @@ class CreateNew extends Component {
 
                     <TextField
                         fullWidth
-                        margin="dense"
                         id="type"
                         label="Loại"
                         select
@@ -146,7 +143,6 @@ class CreateNew extends Component {
 
                     <TextField
                         fullWidth
-                        margin="dense"
                         id="formula"
                         label={data.type}
                         select

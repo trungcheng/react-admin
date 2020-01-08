@@ -62,7 +62,7 @@ class accountService extends FuseUtils.EventEmitter {
                     if (response.data.Result === 1) {
                         resolve({
                             status: true,
-                            data: response.data.Data.Data
+                            data: response.data.Data
                         });
                     } else {
                         reject(response.data.Message);

@@ -34,73 +34,115 @@ import { saveAccount, fetchDetail, getAccountByCompanyId } from './store/actions
 import * as Actions from 'app/store/actions';
 import AppContext from 'app/AppContext';
 
-class MemberDialogAdd extends Component {
+class AccountDialogAdd extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            openMode: props.open,
             showPassword: false,
-            data: {
-                company: 1,
-                account: 0,
-                sub_user: '',
-                password: '',
-                safe_code: '',
-                note: '',
-                status: true
+            isFormValid: false,
+            showRes: false,
+            defaultData: {
+                AccountID: 0,
+                CompanyID: 1,
+                ParentID: 0,
+                AccountName: '',
+                UserName: '',
+                Password: '',
+                SecretCode: '',
+                Note: '',
+                Status: 1
             },
             statusList: [
-                { value: true, label: 'True' },
-                { value: false, label: 'False' }
+                { value: 1, label: 'True' },
+                { value: 0, label: 'False' }
             ],
-            accountList: [
-                { value: 0, label: 'Tài khoản gốc' },
-                { value: 1, label: 'dtf35b118' },
-                { value: 2, label: 'dtf3630' },
-                { value: 3, label: 'dtf39' }
-            ],
+            accountListByCompany: [],
             companyList: [
-                { value: 1, label: 'bong88' },
-                { value: 2, label: 'sbobet' },
-                { value: 3, label: '3in1bet' }
+                { value: 1, label: '3In' },
+                { value: 2, label: 'LD' },
+                { value: 3, label: 'New789' },
+                { value: 4, label: 'Sbobet' },
+                { value: 5, label: 'Viet88' },
+                { value: 6, label: 'Bong88' }
             ]
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.open !== this.state.open) {
-            this.setState({
-                openMode: nextProps.open
-            });
+        const { defaultData } = this.state;
+
+        if (nextProps.data !== this.state.defaultData) {
+            this.handleAccountByCompany(defaultData.CompanyID);
         }
     }
 
-    handleClose = () => {
-        this.setState({
-            openMode: false,
-            showPassword: false,
-            data: {
-                ...this.state.data,
-                status: true
+    handleAccountByCompany = (companyId) => {
+        this.props.getAccountByCompanyId(companyId, (res) => {
+            if (res.status) {
+                this.setState({
+                    accountListByCompany: res.data
+                });
             }
         });
     }
 
+    handleClose = () => {
+        const { onClose } = this.props;
+
+        this.setState({
+            showPassword: false,
+            isFormValid: false,
+            showRes: false,
+            defaultData: {
+                AccountID: 0,
+                CompanyID: 1,
+                ParentID: 0,
+                AccountName: '',
+                UserName: '',
+                Password: '',
+                SecretCode: '',
+                Note: '',
+                Status: 1
+            }
+        });
+
+        onClose();
+    }
+
+    handleRefresh = () => {
+        const { onRefresh } = this.props;
+
+        onRefresh();
+    }
+
     handleSave = () => {
-        const { data } = this.state;
+        const { defaultData } = this.state;
         
-        console.log(data);
+        this.setState({
+            showRes: true
+        }, () => {
+            this.props.saveAccount(defaultData, (status) => {
+                if (status) {
+                    this.handleRefresh();
+                    this.handleClose();
+                    this.props.showMessage({ message: 'Thêm mới thành công' });
+                }
+            });
+        });
     }
 
     handleChange = (field, value) => {
-        const { data } = this.state;
+        const { defaultData } = this.state;
 
-        data[field] = value;
+        defaultData[field] = value;
+        if (field === 'CompanyID') {
+            this.handleAccountByCompany(value);
+        }
 
         this.setState({
-            data
+            defaultData
         });
     };
 
@@ -114,39 +156,59 @@ class MemberDialogAdd extends Component {
         e.preventDefault();
     };
 
+    disableButton = () => {
+        this.setState({
+            isFormValid: false
+        });
+    }
+
+    enableButton = () => {
+        this.setState({
+            isFormValid: true
+        });
+    }
+
     render() {
+        const { open, success, errorMsg } = this.props;
         const { 
-            openMode, 
-            showPassword, 
-            data,
+            showRes,
+            showPassword,
+            isFormValid, 
+            defaultData,
             statusList,
-            accountList,
+            accountListByCompany,
             companyList
         } = this.state;
 
         return (
             <div>
                 <Dialog
-                    open={openMode}
+                    open={open}
                     fullWidth={true}
                     maxWidth={'sm'}
                     onClose={this.handleClose}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Thêm mới tài khoản</DialogTitle>
-                    <DialogContent>
-                        <form noValidate autoComplete="off">
+                    <Formsy
+                        onValidSubmit={this.handleSave}
+                        onValid={this.enableButton}
+                        onInvalid={this.disableButton}
+                        ref={c => this.refForm = c}
+                        className="flex flex-col justify-center w-full"
+                    >
+                        <DialogTitle id="form-dialog-title">Thêm mới tài khoản</DialogTitle>
+                        <DialogContent>
 
                             <TextField
+                                className="mb-10"
                                 fullWidth
-                                margin="dense"
-                                id="company"
+                                required
+                                id="CompanyID"
                                 label="Công ty"
                                 select
-                                value={data.company}
-                                onChange={(e) => this.handleChange('company', e.target.value)}
+                                value={defaultData.CompanyID}
+                                onChange={(e) => this.handleChange('CompanyID', e.target.value)}
                                 variant="outlined"
-                                style={{marginBottom: 10}}
                             >
                                 {companyList.map(option => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -156,117 +218,197 @@ class MemberDialogAdd extends Component {
                             </TextField>
 
                             <TextField
-                                fullWidth
-                                margin="dense"
-                                id="account"
-                                label="Thuộc tài khoản"
-                                select
-                                value={data.account}
-                                onChange={(e) => this.handleChange('account', e.target.value)}
-                                variant="outlined"
-                                style={{marginBottom: 10}}
-                            >
-                                {accountList.map(option => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label.toUpperCase()}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-
-                            <TextField
+                                className="mb-10"
                                 fullWidth
                                 required
-                                margin="dense"
-                                id="sub_user"
-                                label="Tên đăng nhập"
-                                onChange={(e) => this.handleChange('sub_user', e.target.value)}
-                                value={data.sub_user}
-                                type="text"
+                                id="ParentID"
+                                label="Thuộc tài khoản"
+                                select
+                                value={defaultData.ParentID}
+                                onChange={(e) => this.handleChange('ParentID', e.target.value)}
                                 variant="outlined"
-                                style={{marginBottom: 10}}
-                            />
+                            >
+                                {
+                                    accountListByCompany.length > 0 && accountListByCompany.map(option => (
+                                        <MenuItem key={option.ID} value={option.ID}>
+                                            {option.Name.toUpperCase()}
+                                        </MenuItem>
+                                    ))
+                                }
+                            </TextField>
 
-                            <TextField
-                                fullWidth
-                                margin="dense"
-                                label="Mật khẩu"
-                                id="password"
-                                onChange={(e) => this.handleChange('password', e.target.value)}
-                                value={data.password}
-                                type={showPassword ? 'text' : 'password'}
-                                InputProps={{
-                                    endAdornment: <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={this.handleClickShowPassword}
-                                            onMouseDown={this.handleMouseDownPassword}
-                                            edge="end"
-                                        >
-                                            {showPassword ? <Visibility /> : <VisibilityOff />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }}
-                                variant="outlined"
-                                style={{marginBottom: 10}}
-                            />
+                            {
+                                defaultData.ParentID == 0 && <div>
+                                    <TextFieldFormsy
+                                        className="mb-10"
+                                        fullWidth
+                                        required
+                                        name="UserName"
+                                        label="Tên đăng nhập"
+                                        onChange={(e) => this.handleChange('UserName', e.target.value)}
+                                        validations={{
+                                            minLength: 4
+                                        }}
+                                        validationErrors={{
+                                            minLength: 'Tên đăng nhập tối thiểu 4 kí tự'
+                                        }}
+                                        value={defaultData.UserName}
+                                        type="text"
+                                        variant="outlined"
+                                    />
 
-                            <TextField
+                                    <TextFieldFormsy
+                                        className="mb-10"
+                                        fullWidth
+                                        required
+                                        label="Mật khẩu"
+                                        name="Password"
+                                        onChange={(e) => this.handleChange('Password', e.target.value)}
+                                        validations={{
+                                            minLength: 6
+                                        }}
+                                        validationErrors={{
+                                            minLength: 'Mật khẩu tối thiểu 6 kí tự'
+                                        }}
+                                        value={defaultData.Password}
+                                        type={showPassword ? 'text' : 'password'}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={this.handleClickShowPassword}
+                                                    onMouseDown={this.handleMouseDownPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        }}
+                                        variant="outlined"
+                                    />
+                                </div>
+                            }
+
+                            {
+                                defaultData.ParentID > 0 && <TextFieldFormsy
+                                    className="mb-10"
+                                    fullWidth
+                                    required
+                                    name="AccountName"
+                                    label="Tên tài khoản"
+                                    onChange={(e) => this.handleChange('AccountName', e.target.value)}
+                                    validations={{
+                                        minLength: 4
+                                    }}
+                                    validationErrors={{
+                                        minLength: 'Tên tài khoản tối thiểu 4 kí tự'
+                                    }}
+                                    value={defaultData.AccountName}
+                                    type="text"
+                                    variant="outlined"
+                                /> 
+                            }
+
+                            <TextFieldFormsy
+                                className="mb-10"
                                 fullWidth
-                                margin="dense"
-                                id="safe_code"
+                                required
+                                name="SecretCode"
                                 label="Mã an toàn"
-                                onChange={(e) => this.handleChange('safe_code', e.target.value)}
-                                value={data.safe_code}
+                                onChange={(e) => this.handleChange('SecretCode', e.target.value)}
+                                value={defaultData.SecretCode}
                                 type="text"
                                 variant="outlined"
-                                style={{marginBottom: 10}}
                             />
 
-                            <TextField
+                            <TextFieldFormsy
+                                className="mb-10"
                                 fullWidth
-                                margin="dense"
-                                id="note"
+                                required
+                                name="Note"
                                 label="Chú thích"
-                                onChange={(e) => this.handleChange('note', e.target.value)}
-                                value={data.note}
+                                onChange={(e) => this.handleChange('Note', e.target.value)}
+                                value={defaultData.Note}
                                 type="text"
                                 variant="outlined"
-                                style={{marginBottom: 10}}
                             />
 
-                            <TextField
+                            <TextFieldFormsy
+                                className="mb-10"
                                 fullWidth
+                                required
                                 disabled
-                                margin="dense"
-                                id="status"
+                                name="Status"
                                 label="Trạng thái"
                                 select
-                                value={data.status}
-                                onChange={(e) => this.handleChange('status', e.target.value)}
+                                value={defaultData.Status}
+                                onChange={(e) => this.handleChange('Status', e.target.value)}
                                 variant="outlined"
-                                style={{marginBottom: 10}}
                             >
                                 {statusList.map(option => (
                                     <MenuItem key={option.value} value={option.value}>
                                         {option.label}
                                     </MenuItem>
                                 ))}
-                            </TextField>
-                                    
-                        </form>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={this.handleSave} color="primary">
-                            Lưu
-                        </Button>
-                        <Button onClick={this.handleClose} color="primary">
-                            Hủy
-                        </Button>
-                    </DialogActions>
+                            </TextFieldFormsy>
+
+                            {
+                                !success && showRes && <FormControl error>
+                                    <FormHelperText 
+                                        style={{fontSize: '1.4rem'}} 
+                                        id="component-error-text"
+                                    >
+                                        { errorMsg }
+                                    </FormHelperText>
+                                </FormControl>
+                            }
+
+                            {
+                                success && showRes && <FormControl>
+                                    <FormHelperText 
+                                        style={{
+                                            fontSize: '1.4rem',
+                                            color: 'green'
+                                        }} 
+                                        id="component-success-text"
+                                    >
+                                        Thêm mới thành công
+                                    </FormHelperText>
+                                </FormControl>
+                            }
+                                        
+                        </DialogContent>
+                        <DialogActions>
+                            <Button color="primary" disabled={!isFormValid} type="submit">
+                                Lưu
+                            </Button>
+                            <Button onClick={this.handleClose} color="primary">
+                                Hủy
+                            </Button>
+                        </DialogActions>
+                    </Formsy>
                 </Dialog>
             </div>
         )
     }
 }
 
-export default MemberDialogAdd;
+const mapStateToProps = (state) => {
+    return {
+        success: state.account.account.success,
+        errorMsg: state.account.account.error
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        saveAccount: bindActionCreators(saveAccount, dispatch),
+        fetchDetail: bindActionCreators(fetchDetail, dispatch),
+        showMessage: bindActionCreators(Actions.showMessage, dispatch),
+        getAccountByCompanyId: bindActionCreators(getAccountByCompanyId, dispatch)
+    }
+}
+
+AccountDialogAdd.contextType = AppContext;
+
+export default connect(mapStateToProps, mapDispatchToProps)(React.memo(AccountDialogAdd));

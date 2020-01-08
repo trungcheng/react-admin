@@ -65,20 +65,30 @@ export function fetchDetail(accountId) {
     }
 }
 
-export function getAccountByCompanyId(companyId) {
+export function getAccountByCompanyId(companyId, cb) {
     return function (dispatch) {
         accountService.getAccountByCompanyId(companyId)
             .then(response => {
-                    return dispatch({
+                    dispatch({
                         type: Actions.GET_ACCOUNT_BY_COMPANY_SUCCESS,
                         payload: response.data
+                    });
+
+                    return cb({
+                        status: true,
+                        data: response.data
                     });
                 }
             )
             .catch(error => {
-                return dispatch({
+                dispatch({
                     type: Actions.GET_ACCOUNT_BY_COMPANY_ERROR,
                     payload: error
+                });
+
+                return cb({
+                    status: false,
+                    data: []
                 });
             });
     }

@@ -127,18 +127,16 @@ class FormulaDialogEdit extends Component {
 
                             <TextField
                                 fullWidth
-                                margin="dense"
                                 id="formula_name"
                                 label="Tên công thức"
                                 value={defaultData.formula_name}
                                 onChange={(e) => this.handleChange('formula_name', e.target.value)}
                                 variant="outlined"
-                                style={{marginBottom: 10}}
+                                style={{marginBottom: 20}}
                             />
 
                             <TextField
                                 fullWidth
-                                margin="dense"
                                 id="code"
                                 label="Code"
                                 select
@@ -146,7 +144,7 @@ class FormulaDialogEdit extends Component {
                                 onChange={(e) => this.handleChange('code', e.target.value)}
                                 value={defaultData.code}
                                 variant="outlined"
-                                style={{marginBottom: 10}}
+                                style={{marginBottom: 20}}
                             >
                                 {codeList.map(option => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -157,14 +155,13 @@ class FormulaDialogEdit extends Component {
 
                             <TextField
                                 fullWidth
-                                margin="dense"
                                 id="formula_format"
                                 label="Kiểu công thức"
                                 select
                                 onChange={(e) => this.handleChange('formula_format', e.target.value)}
                                 value={defaultData.formula_format}
                                 variant="outlined"
-                                style={{marginBottom: 10}}
+                                style={{marginBottom: 20}}
                             >
                                 {formatList.map(option => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -175,14 +172,13 @@ class FormulaDialogEdit extends Component {
 
                             <TextField
                                 fullWidth
-                                margin="dense"
                                 id="currency_name"
                                 label="Loại tiền"
                                 select
                                 onChange={(e) => this.handleChange('currency_name', e.target.value)}
                                 value={defaultData.currency_name}
                                 variant="outlined"
-                                style={{marginBottom: 10}}
+                                style={{marginBottom: 20}}
                             >
                                 {currencyList.map(option => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -193,26 +189,24 @@ class FormulaDialogEdit extends Component {
 
                             <TextField
                                 fullWidth
-                                margin="dense"
                                 id="heso"
                                 label="Hệ số"
                                 value={defaultData.heso}
                                 onChange={(e) => this.handleChange('heso', e.target.value)}
                                 type="text"
                                 variant="outlined"
-                                style={{marginBottom: 10}}
+                                style={{marginBottom: 20}}
                             />
 
                             <TextField
                                 fullWidth
-                                margin="dense"
                                 id="giathau"
                                 label="Giá thầu"
                                 value={defaultData.giathau}
                                 onChange={(e) => this.handleChange('giathau', e.target.value)}
                                 type="text"
                                 variant="outlined"
-                                style={{marginBottom: 10}}
+                                style={{marginBottom: 20}}
                             />
 
                             <FormControl style={{marginTop: 5}}>
