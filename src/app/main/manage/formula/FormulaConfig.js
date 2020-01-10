@@ -1,30 +1,17 @@
-import { CreateNew } from './create-new';
-import { Formula } from './formula';
-import { Member } from './member';
-import { Account } from './account';
+import { authRoles } from 'app/auth';
+import Formula from './Formula';
 
-export const ManageConfig = {
+export const FormulaConfig = {
     settings: {
         layout: {
             config: {}
         }
     },
+    auth    : authRoles.admin,
     routes  : [
-        {
-            path     : '/create-new',
-            component: CreateNew
-        },
         {
             path     : '/formula',
             component: Formula
-        },
-        {
-            path     : '/member',
-            component: Member
-        },
-        {
-            path     : '/account',
-            component: Account
         }
     ]
 };

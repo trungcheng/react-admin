@@ -6,6 +6,7 @@ import create from 'app/main/manage/create-new/store/reducers';
 import formula from 'app/main/manage/formula/store/reducers';
 import member from 'app/main/manage/member/store/reducers';
 import account from 'app/main/manage/account/store/reducers';
+import user from 'app/main/manage/user/store/reducers';
 
 import quickPanel from 'app/fuse-layouts/shared-components/quickPanel/store/reducers';
 
@@ -17,6 +18,7 @@ const createReducer = (asyncReducers) =>
         formula,
         member,
         account,
+        user,
         quickPanel,
         ...asyncReducers
     });

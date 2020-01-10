@@ -2,17 +2,17 @@ import React from 'react';
 import {Redirect} from 'react-router-dom';
 import {FuseUtils} from '@fuse';
 
-import {ManageConfig} from 'app/main/manage/ManageConfig';
-
 import {pagesConfigs} from 'app/main/pages/pagesConfigs';
 import {authRoleExamplesConfigs} from 'app/main/auth/authRoleExamplesConfigs';
+import {manageConfigs} from 'app/main/manage/manageConfigs';
+
 import {LoginConfig} from 'app/main/login/LoginConfig';
 import {LogoutConfig} from 'app/main/logout/LogoutConfig';
 
 const routeConfigs = [
     ...pagesConfigs,
     ...authRoleExamplesConfigs,
-    ManageConfig,
+    ...manageConfigs,
     LogoutConfig,
     LoginConfig
 ];
